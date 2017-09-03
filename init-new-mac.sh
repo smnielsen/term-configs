@@ -1,0 +1,109 @@
+#!/bin/bash
+
+BREW=(
+  nvm
+  yarn
+  git
+  watchman
+  mas # Mac App Store installation CLI
+)
+
+CASK=(
+  google-chrome
+  firefox
+  slack
+  1password
+  evernote
+  dropbox
+  sizeup
+  atom
+  sublime-text
+  webstorm
+  macdown
+  android-studio
+  java
+)
+
+MAS=(
+  "Xcode:497799835"
+  "Boxy:1053031090"
+  "Keynote:409183694"
+  "Todoist:585829637"
+)
+
+YARN_GLOBAL=(
+  create-react-app
+  create-react-native-app
+  react-native-cli
+  nodemon
+  webpack-dev-server
+)
+
+## Not avaliable
+MANUAL=(
+  "Outlook;https://webmail.netlight.com"
+)
+
+###############################
+## INSTALL ALL APPLICATIONS
+
+echo "# Setting up new Mac"
+
+echo ">> Installing Homebrew"
+#/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+echo ""
+
+echo ">> Installing zsh"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+
+echo "## Homebrew - Terminal Apps"
+for program in "${BREW[@]}"; do
+  echo ">> $program"
+  #brew install $program
+done
+echo ""
+
+echo "## Homebrew Cask - Programs"
+for program in "${CASK[@]}"; do
+  echo ">> $program"
+  #brew cask install $program
+done
+echo ""
+
+echo "## Mac App Store - Applications"
+for program in "${MAS[@]}"; do
+  split=(${program//:/ })
+  name=${split[0]}
+  id=${split[1]}
+  printf "%-20s | %-20s" ">> $name" "$id"
+  echo ""
+  #mas install $id
+done
+echo ""
+
+echo "## Yarn - Global Apps"
+for program in "${YARN_GLOBAL[@]}"; do
+  echo ">> $program"
+  #yarn global add $program
+done
+echo ""
+
+echo "## Requires Manual installation"
+for program in "${MANUAL[@]}"; do
+  split=(${program//:/ })
+  name=${split[0]}
+  url=${split[1]}
+  printf "%-20s | %-50s" ">> $name" "$url"
+  echo ""
+done
+echo ""
+
+###############################
+
+echo ">>>> Finilized setting up Mac <<<<"
+echo "   Welcome to a new world Simon   "
+echo ""
+echo " Download configuration files from git"
+echo " -- https://github.com/smnielsen/term-configs"
+echo ""
+exit 0

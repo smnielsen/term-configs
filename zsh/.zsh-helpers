@@ -1,0 +1,24 @@
+columns() {
+  printf "%-15s | %-40s" ">> $1" "$2"
+}
+########################################
+# Global functions for terminal
+########################################
+
+# Shortcut to docker exec
+# Use dsh <container name> from the shell
+# You can optionally provide a command to
+# run inside the container, if you do not
+# the default command is /bin/sh.
+dsh() {
+  if [ ! -z "$2" ]; then
+    docker exec -it "$1" "${@:2}"
+  else
+    docker exec -it "$1" /bin/sh
+  fi
+}
+
+echo " ==== Help methods ===="
+columns "find-dirs-over" "find all dirs over 10GB recursively"
+columns "dsh" "Run docker exec. Ex: 'dsh dpo-auth'"
+echo ""

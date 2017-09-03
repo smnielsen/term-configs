@@ -1,0 +1,19 @@
+columns() {
+  printf "%-15s | %-40s" ">> $1" "$2"
+}
+## GIT
+alias rebase='git stash clear && git stash && git pull --rebase && git stash apply'
+alias push='git stash clear && git stash && git push && git stash apply'
+alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
+
+## JAVA + gradlew
+alias gw='./gradlew'
+alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
+
+## Print
+echo " ====   Aliases    ===="
+columns "rebase" "git rebase and stash away what's not committed"
+columns "push" "git push and stash away what's not committed"
+columns "git-tag-sort" "show sorted list of tags"
+columns "gw" "./gradlew"
+columns "docker-prune" "clean all docker containers, volumes and images"

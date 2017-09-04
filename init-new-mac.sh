@@ -15,15 +15,18 @@ echoAll() {
 }
 
 BREW=(
+  zsh
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+  zsh-git-prompt
   nvm
   yarn
   git
   watchman
   mas # Mac App Store installation CLI
-  zsh
-  zsh-syntax-highlighting
-  zsh-autosuggestions
-  zsh-git-prompt
+  jpeg
+  imagemagick
+  pngquant
 )
 
 CASK=(
@@ -54,6 +57,7 @@ YARN_GLOBAL=(
   create-react-app
   create-react-native-app
   react-native-cli
+  grunt-cli
   nodemon
   webpack-dev-server
 )
@@ -131,6 +135,12 @@ for program in "${MANUAL[@]}"; do
   echo ""
 done
 echo ""
+echo "-- Add Custom Colors to terminal"
+echo "   > iterm2 -> Preferences -> Profiles -> Colors -> Color Presets... -> Import"
+echo "   > Choose iterm/netlight-colors.itermcolors"
+echo "   > Color presets... -> netlight-colors"
+echo "-- Set to always open previous dir"
+echo "   > iterm2 -> Preferences -> Profiles -> General -> Working directory -> Reuse previous ..."
 echo "--------------------"
 echo "FYI: You should probly restart your terminal now..."
 echo ""

@@ -1,5 +1,19 @@
 #!/bin/bash
 
+echoAll() {
+  echo "### Homebrew"
+  echo ">> ${BREW[@]}"
+  echo ""
+  echo "### Homebrew Cask"
+  echo ">> ${CASK[@]}"
+  echo ""
+  echo "### Mac App Store"
+  echo ">> ${MAS[@]}"
+  echo ""
+  echo "### Yarn Globals"
+  echo ">> ${YARN_GLOBAL[@]}"
+}
+
 BREW=(
   nvm
   yarn
@@ -17,6 +31,7 @@ CASK=(
   dropbox
   sizeup
   atom
+  iterm2
   sublime-text
   webstorm
   macdown
@@ -57,7 +72,7 @@ echo ">> Installing Homebrew"
 echo ""
 
 echo ">> Installing zsh"
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+#sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo ""
 
 echo ">> Adding oh-my-zsh custom config"
@@ -96,23 +111,24 @@ for program in "${YARN_GLOBAL[@]}"; do
 done
 echo ""
 
-echo "## Requires Manual installation"
+###############################
+echo ">>>> Finilized setting up Mac <<<<"
+echo "   Welcome to a new world Simon   "
+echo ""
+echo "## Installed:"
+echoAll
+echo ""
+echo "## Requires Manual installation:"
 for program in "${MANUAL[@]}"; do
-  split=(${program//:/ })
+  split=(${program//;/ })
   name=${split[0]}
   url=${split[1]}
   printf "%-20s | %-50s" ">> $name" "$url"
   echo ""
 done
 echo ""
-
-###############################
-
-echo ">>>> Finilized setting up Mac <<<<"
-echo "   Welcome to a new world Simon   "
-echo ""
-echo " Download configuration files from git"
-echo " -- https://github.com/smnielsen/term-configs"
+echo "--------------------"
+echo "FYI: You should probly restart your terminal now..."
 echo ""
 
 cd ${PREV_DIR}

@@ -1,5 +1,6 @@
 columns() {
   printf "%-15s | %-40s" ">> $1" "$2"
+  echo ""
 }
 ########################################
 # Global functions for terminal

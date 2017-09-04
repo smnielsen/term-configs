@@ -35,13 +35,12 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 ################################
 ## LOAD HELPER CONFIGS
-DIR=$(dirname $1)
 
 ### Load Helpers
-source ${DIR}/.zsh-helpers
+source ${TERM_CONFIG_DIR}/zsh/.zsh-helpers
 
 ### Load ALIASES
-source ${DIR}/.zsh-aliases
+source ${TERM_CONFIG_DIR}/zsh/.zsh-aliases
 
 # Load Zgen
-source ${DIR}/.zsh-zgen
+source ${TERM_CONFIG_DIR}/zsh/.zsh-zgen

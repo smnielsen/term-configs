@@ -1,5 +1,6 @@
 columns() {
   printf "%-15s | %-40s" ">> $1" "$2"
+  echo ""
 }
 ## GIT
 alias rebase='git stash clear && git stash && git pull --rebase && git stash apply'

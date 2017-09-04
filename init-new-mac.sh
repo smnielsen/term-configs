@@ -48,6 +48,9 @@ MANUAL=(
 ## INSTALL ALL APPLICATIONS
 
 echo "# Setting up new Mac"
+PREV_DIR=$(pwd)
+DIRNAME=$(dirname $1)
+cd ## Start in HOME dir
 
 echo ">> Installing Homebrew"
 #/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -55,6 +58,11 @@ echo ""
 
 echo ">> Installing zsh"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+echo ""
+
+echo ">> Adding oh-my-zsh custom config"
+echo "## Custom config from: https://github.com/smnielsen/term-configs" >> .zshrc
+echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 
 echo "## Homebrew - Terminal Apps"
 for program in "${BREW[@]}"; do
@@ -106,4 +114,6 @@ echo ""
 echo " Download configuration files from git"
 echo " -- https://github.com/smnielsen/term-configs"
 echo ""
+
+cd ${PREV_DIR}
 exit 0

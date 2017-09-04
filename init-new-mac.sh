@@ -68,7 +68,7 @@ MANUAL=(
 
 echo "# Setting up new Mac"
 PREV_DIR=$(pwd)
-DIRNAME=$(dirname $1)
+DIRNAME=$(dirname $0)
 cd ## Start in HOME dir
 
 echo ">> Installing Homebrew"

@@ -20,6 +20,10 @@ BREW=(
   git
   watchman
   mas # Mac App Store installation CLI
+  zsh
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+  zsh-git-prompt
 )
 
 CASK=(
@@ -64,19 +68,16 @@ MANUAL=(
 
 echo "# Setting up new Mac"
 PREV_DIR=$(pwd)
-DIRNAME=$(dirname $1)
+DIRNAME=$(dirname $0)
 cd ## Start in HOME dir
 
 echo ">> Installing Homebrew"
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 echo ""
 
-echo ">> Installing zsh"
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-echo ""
-
 echo ">> Adding oh-my-zsh custom config"
 echo "## Custom config from: https://github.com/smnielsen/term-configs" >> .zshrc
+echo "export TERM_CONFIG_DIR=${DIRNAME}" >> .zshrc
 echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 
 echo "## Homebrew - Terminal Apps"
@@ -85,6 +86,9 @@ for program in "${BREW[@]}"; do
   brew install $program
 done
 echo ""
+
+echo ">> Installing zgen"
+git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
 
 echo "## Homebrew Cask - Programs"
 for program in "${CASK[@]}"; do

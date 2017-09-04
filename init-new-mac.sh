@@ -68,11 +68,11 @@ DIRNAME=$(dirname $1)
 cd ## Start in HOME dir
 
 echo ">> Installing Homebrew"
-#/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 echo ""
 
 echo ">> Installing zsh"
-#sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 echo ""
 
 echo ">> Adding oh-my-zsh custom config"
@@ -82,14 +82,14 @@ echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 echo "## Homebrew - Terminal Apps"
 for program in "${BREW[@]}"; do
   echo ">> $program"
-  #brew install $program
+  brew install $program
 done
 echo ""
 
 echo "## Homebrew Cask - Programs"
 for program in "${CASK[@]}"; do
   echo ">> $program"
-  #brew cask install $program
+  brew cask install $program
 done
 echo ""
 
@@ -100,14 +100,14 @@ for program in "${MAS[@]}"; do
   id=${split[1]}
   printf "%-20s | %-20s" ">> $name" "$id"
   echo ""
-  #mas install $id
+  mas install $id
 done
 echo ""
 
 echo "## Yarn - Global Apps"
 for program in "${YARN_GLOBAL[@]}"; do
   echo ">> $program"
-  #yarn global add $program
+  yarn global add $program
 done
 echo ""
 

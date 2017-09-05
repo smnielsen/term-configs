@@ -42,6 +42,7 @@ CASK=(
   sublime-text
   webstorm
   macdown
+  skitch
   android-studio
   java
 )

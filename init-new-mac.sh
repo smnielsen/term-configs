@@ -30,6 +30,7 @@ BREW=(
 )
 
 CASK=(
+  franz
   google-chrome
   firefox
   slack

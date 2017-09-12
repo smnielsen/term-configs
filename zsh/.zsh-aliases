@@ -3,10 +3,10 @@ columns() {
   echo ""
 }
 ## GIT
-alias rebase='git stash clear && git stash && git pull --rebase && git stash apply'
-alias push='git stash clear && git stash && git push && git stash apply'
+alias rebase='git stash && git fetch && git rebase && git stash pop'
+alias push='git stash && git push && git stash pop'
 alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
-
+alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 ## JAVA + gradlew
 alias gw='./gradlew'
 alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
@@ -16,5 +16,6 @@ echo " ====   Aliases    ===="
 columns "rebase" "git rebase and stash away what's not committed"
 columns "push" "git push and stash away what's not committed"
 columns "git-tag-sort" "show sorted list of tags"
+columns "git-diff-name" "show list of files in commit"
 columns "gw" "./gradlew"
 columns "docker-prune" "clean all docker containers, volumes and images"

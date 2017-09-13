@@ -86,6 +86,10 @@ echo "## Custom config from: https://github.com/smnielsen/term-configs" >> .zshr
 echo "export TERM_CONFIG_DIR=${DIRNAME}" >> .zshrc
 echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 
+echo ">> Setting git global config"
+git config --global user.name "Simon Nielsen"
+git config --global user.email "simonmtnielsen@gmail.com"
+
 echo "## Homebrew - Terminal Apps"
 for program in "${BREW[@]}"; do
   echo ">> $program"

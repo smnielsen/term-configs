@@ -1,0 +1,13 @@
+########################################
+## GIT helpers
+########################################
+alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
+
+########################################
+## JWT helper
+########################################
+alias jwt-perms="node $SMN_CONFIG_DIR/scripts/jwt/jwt-enrich-perms.js"
+alias jwt-update="node $SMN_CONFIG_DIR/scripts/jwt/jwt-enrich.js"
+alias jwt-verify="node $SMN_CONFIG_DIR/scripts/jwt/jwt-verify.js"
+alias jwt-refresh="node $SMN_CONFIG_DIR/scripts/jwt/jwt-refresh.js"
+alias jwt-decode="node $SMN_CONFIG_DIR/scripts/jwt/jwt-decode.js"

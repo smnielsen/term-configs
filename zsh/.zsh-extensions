@@ -1,0 +1,69 @@
+########################################
+## Git / Version Handling
+########################################
+alias grebase='git stash; git fetch; git pull --rebase'
+alias gpush='git stash; git push'
+alias gtagsort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
+alias gdiffname="git diff-tree --no-commit-id --name-only -r $1"
+
+########################################
+## NPM Helpers
+########################################
+alias npm-clean='rm -rf node_modules; rm -f package-lock.json'
+alias npm-reset='npm-clean; nvm i; npm i'
+
+########################################
+## docker-compose helpers
+########################################
+alias dco="docker-compose"
+alias dcol="docker-compose logs $1"
+alias dcolf="docker-compose logs -f $1"
+
+########################################
+## Java + Gradlew
+########################################
+alias gw='./gradlew'
+
+########################################
+## Docker Helpers
+########################################
+alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
+
+########################################
+## Couchbase Helpers
+########################################
+alias couchbase-create='docker run --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.1'
+alias couchbase-start='docker start db'
+
+########################################
+## Global functions for terminal
+########################################
+lookup-port() {
+    local port=$1
+    sudo lsof -n -i:$port | grep LISTEN
+}
+# Shortcut to docker exec
+# Use dsh <container name> from the shell
+# You can optionally provide a command to
+# run inside the container, if you do not
+# the default command is /bin/sh.
+dsh() {
+    if [ ! -z "$2" ]; then
+        docker exec -it "$1" "${@:2}"
+    else
+        docker exec -it "$1" /bin/sh
+    fi
+}
+
+# shortcut to docker logs
+# User $ dl <container name> from the shell
+dl() {
+    local name=$1
+    cids=($(docker ps -aqf "name=$1"))
+    cid=${cids[1]}
+    echo "# Container logs for: ${cid}"
+    docker logs -f ${cid}
+}
+
+# Fun times
+alias ascii-dunno='echo "¯\_(ツ)_/¯"'

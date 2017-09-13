@@ -1,0 +1,176 @@
+##########
+## Kubernetes Commands
+##########
+k-help() {
+    echo '
+    ### Login (Requires preset config for individual cloud)
+# Azure:        "k-az {registry}" will log you in to Azure and switch to registry.
+# Google Cloud: "k-gcp {project} {cluster} [zone:europe-west1-c]" will set current project and switch to cluster.
+
+    ### Commands
+# "k-ns"         will let you set the current namespace. `k-ns {namespace}`
+# "k-ctx"        will let you switch between the different context setups, `k-ctx {context}`
+# "k-logs"       will print and follow logs for service in current namespace. `k-logs {service}`
+# "k-pods"       will print pods in current namespace, or all if current ns is not set. `k-pods [namespace]`
+# "k-describe"   Will print information about POD. `k-describe [POD]`
+# "k-svc"        will print services in current namespace, or all if current ns is not set. `k-svc [namespace]`
+# "k-proxy"      starts a port-forwarding of service. `k-proxy {service} [outport:7000] [inport:8080]`
+'
+}
+
+
+### Default to ?
+export KUBE_NAMESPACE=
+
+### GCP: Setup Google Cloud K8s cluster
+k-gcp() {
+    local project=$1
+    local cluster=$2
+    local zone=${3:-europe-west1-c}
+    gcloud config set project ${project};
+    gcloud container clusters get-credentials ${cluster} --zone ${zone};
+}
+
+### Azure: Login to Azure and set cluster
+k-az() {
+    local registry=$1
+    if [ -z $registry ]; then
+        echo "# MISSING REGISTRY!"
+        echo "=> Please define which azure registry to login to!"
+        echo "$ k-az myregistry"
+        return
+    fi
+    az login
+    echo "# Successfully logged in to Azure"
+    echo "-> Connecting to ${registry}"
+    az acr login -n $registry
+}
+
+k-az-logs() {
+    local app=$1
+    local env=${2:-bin-dev}
+    az login --service-principal -u ${AZ_SP_LOG_READER_NAME} -p ${AZ_SP_LOG_READER_PASSWORD} --tenant ${AZ_SP_LOG_READER_TENANT}
+    az webapp log tail --resource-group bin-dev --name ${env}-${app}
+}
+
+
+k-ns() {
+    if [ -z $1 ]; then
+        echo "# K8S Current namespace: ${KUBE_NAMESPACE:-not set}"
+    else
+        echo "# Global K8S namespace set to: ${1}"
+        export KUBE_NAMESPACE=$1
+    fi
+}
+
+k-ctx () {
+    local context=$1
+    if [ -z $context ]; then
+        echo "# K8S Current Cluster: $(kubectl config current-context)"
+        kubectx
+    else
+        kubectl config use-context $context;
+    fi
+}
+
+k-logs() {
+    local svc=$1
+    local container=${2}
+    local namespace=${3-$KUBE_NAMESPACE}
+    if [ ! -z $container ]; then
+        container=-c${container}
+    fi
+    
+    if [ -z $svc ] || [ -z $namespace ]; then
+        echo "# Missing required params!"
+        echo "# TIP: Set namespace: $ k-ns {namespace}"
+        echo "$ k-logs {svc} [namespace]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
+    else
+        (set -x; kubectl logs -f -n ${namespace} ${container} $(__k-pod-name ${svc} ${namespace}))
+    fi
+}
+
+k-pods () {
+    local namespace=${1-$KUBE_NAMESPACE}
+    if [ ! -z $namespace ]; then
+        kubectl -n $namespace get pods;
+    else
+        kubectl get pods --all-namespaces
+    fi
+}
+
+k-describe() {
+    local svc=$1
+    local namespace=${2-$KUBE_NAMESPACE}
+    
+    if [ -z $svc ] || [ -z $namespace ]; then
+        echo "# Missing required params!"
+        echo "# TIP: Set namespace: $ k-ns {namespace}"
+        echo "$ k-describe {pod} [namespace]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
+    else
+        (set -x; kubectl describe pods -n ${namespace} $(__k-pod-name ${svc} ${namespace}))
+    fi
+}
+
+k-svc() {
+    local namespace=${1-$KUBE_NAMESPACE}
+    if [ ! -z $namespace ]; then
+        (set -x; kubectl get svc -n $namespace)
+    else
+        (set -x; kubectl get svc --all-namespaces)
+    fi
+}
+
+k-exec() {
+    local svc=$1
+    local namespace=${2-$KUBE_NAMESPACE}
+    
+    if [ -z $svc ] || [ -z $namespace ]; then
+        echo "# Missing required params!"
+        echo "# TIP: Set namespace: $ k-ns {namespace}"
+        echo "$ k-exec {svc} [namespace]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
+    else
+        kubectl exec -n ${namespace} -it $(__k-pod-name ${svc} ${namespace}) -- sh
+        (set -x; kubectl describe pods -n ${namespace} $(__k-pod-name ${svc} ${namespace}))
+    fi
+}
+##
+## $ k-proxy [SERVICE_NAME] [OUT_PORT] [CONTAINER_PORT]
+## Example:
+##      k-proxy id-keycloak-http 7000 80
+##          
+k-proxy() {
+    local svc=$1
+    local port=${2:-7000}
+    local innerport=${3-8080}
+    local namespace=${4-$KUBE_NAMESPACE}
+    if [ -z $namespace ]; then
+        echo "# Namespace is not set."
+        echo "$ k-ns [NAMESPACE]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
+    else
+        (set -x; kubectl port-forward -n $namespace svc/$svc $port:$innerport)
+    fi
+}
+
+####################
+## HELPERS
+####################
+
+__k-pod-name() {
+    local svc=$1
+    local namespace=$2
+    local podline=($(kubectl get pods -n ${namespace} | grep ${svc}))
+    echo "${podline[1]}"
+}

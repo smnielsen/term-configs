@@ -1,6 +1,19 @@
-
+start=$(date +%s)
+loadstart=
+loadend=
+loading() {
+  local t=$1
+  loadstart=$(date +%s)
+  printf "Loading $t..."
+}
+loaded() {
+  local t=$1
+  loadend=$(date +%s)
+  printf "\r\033[32;1m Loaded $t:\033[0m $((($loadend-$loadstart)%60))s\n"
+}
 ##################################
 ## ZSH SETUP
+loading "oh-my-zsh"
 
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
@@ -11,21 +24,34 @@ plugins=(git)
 # Load zsh
 source $ZSH/oh-my-zsh.sh
 
+loaded "oh-my-zsh"
 ##################################
 ## SETUP ENVIRONMENT VARIABLES
-
+loading "env-vars"
 ### Set default Editor
 export EDITOR=/usr/bin/nano
 
 ### Set java8 as default
-export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+# export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+# export MAVEN_OPTS="-Xms512m -Xmx1024m"
 
-### Load nvm
-export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+### User PATHS
+export PATH=/Users/sini/.bin:$PATH
+
+# Set PYTHONPATH
+export PYTHONPATH=usr/bin
+
+# Android
+export PATH=/usr/local/android-platform-tools:$PATH
+
+# Mosquitto MQTT Broker
+export PATH=/usr/local/opt/mosquitto/bin:$PATH
 
 ### Add local bin path
 export PATH=/usr/local/bin:$PATH
+
+### Add sbin path
+export PATH=$PATH:/usr/local/sbin
 
 ### Add Python to PATH
 export PATH=$PATH:~/Library/Python/3.6/bin
@@ -33,14 +59,73 @@ export PATH=$PATH:~/Library/Python/3.6/bin
 ### Add RVM to PATH for scripting
 export PATH="$PATH:$HOME/.rvm/bin"
 
+### GOlang
+export PATH=$PATH:/usr/local/opt/go/libexec/bin
+export GOPATH=$HOME/dev/go
+export PATH=$PATH:${GOPATH}/bin
+
+### CouchDB
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+
+loaded "env-vars"
+
+### Load nvm
+loading "nvm"
+export NVM_DIR="$HOME/.nvm"
+source /usr/local/opt/nvm/nvm.sh
+loaded "nvm"
+
+#### Load Fuzzy Finder
+loading "Fuzzy Finder"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+loaded "Fuzzy Finder"
+
+## Google Cloud
+loading "google-cloud"
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then 
+    source "${HOME}/google-cloud-sdk/path.zsh.inc"
+fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f "${HOME}/google-cloud-sdk/completion.bash.inc" ]; then 
+    source "${HOME}/google-cloud-sdk/completion.zsh.inc"
+fi
+
+export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
+
+loaded "google-cloud"
+
+### Load Kubernetes and Minikube
+#loading "kubernetes"
+
+#eval $(minikube docker-env)
+
+#loaded "kubernetes"
 ################################
 ## LOAD HELPER CONFIGS
 
-### Load Helpers
-source ${TERM_CONFIG_DIR}/zsh/.zsh-helpers
+loading "zsh-sources"
+### Load Extensions
+source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 
-### Load ALIASES
-source ${TERM_CONFIG_DIR}/zsh/.zsh-aliases
+# Load Cloud bytes algorithms
+source ${SMN_CONFIG_DIR}/zsh/.zsh-bytes
 
+# Load Cloud Shortcuts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-cloud
+
+# Load zsh golang shortcuts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-golang
+
+# Custom aliases
+source ${SMN_CONFIG_DIR}/zsh/.zsh-scripts
+
+loaded "zsh-sources"
 # Load Zgen
-source ${TERM_CONFIG_DIR}/zsh/.zsh-zgen
+loading "zgen"
+source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
+loaded "zgen"
+
+end=$(date +%s)
+printf "\033[34;1m Loaded all: \033[0m $((($end-$start) % 60))s\n"

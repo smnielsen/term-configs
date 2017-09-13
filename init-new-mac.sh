@@ -82,8 +82,8 @@ echo ">> Installing Homebrew"
 echo ""
 
 echo ">> Adding oh-my-zsh custom config"
-echo "## Custom config from: https://github.com/smnielsen/term-configs" >> .zshrc
-echo "export TERM_CONFIG_DIR=${DIRNAME}" >> .zshrc
+echo "## Custom config from: https://github.com/smnielsen/config" >> .zshrc
+echo "export SMN_CONFIG_DIR=${DIRNAME}" >> .zshrc
 echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 
 echo ">> Setting git global config"

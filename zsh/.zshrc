@@ -37,10 +37,10 @@ export PATH="$PATH:$HOME/.rvm/bin"
 ## LOAD HELPER CONFIGS
 
 ### Load Helpers
-source ${TERM_CONFIG_DIR}/zsh/.zsh-helpers
+source ${SMN_CONFIG_DIR}/zsh/.zsh-helpers
 
 ### Load ALIASES
-source ${TERM_CONFIG_DIR}/zsh/.zsh-aliases
+source ${SMN_CONFIG_DIR}/zsh/.zsh-aliases
 
 # Load Zgen
-source ${TERM_CONFIG_DIR}/zsh/.zsh-zgen
+source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen

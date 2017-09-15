@@ -27,6 +27,7 @@ BREW=(
   jpeg
   imagemagick
   pngquant
+  protobuf
 )
 
 CASK=(

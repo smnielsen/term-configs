@@ -16,3 +16,7 @@ All config files for terminal can be found in `zsh` folder.
 
 ## Terminal Settings
 iterm settings are exported to the `iterm` folder.
+
+## Slack Settings
+iterm settings are exported to the `slack` folder.
+* Color schemes

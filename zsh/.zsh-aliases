@@ -11,6 +11,10 @@ alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 alias gw='./gradlew'
 alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
 
+## Couchbase
+alias couchbase-docker='docker run -t --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server:sandbox
+'
+
 ## Print
 echo " ====   Aliases    ===="
 columns "rebase" "git rebase and stash away what's not committed"
@@ -19,3 +23,4 @@ columns "git-tag-sort" "show sorted list of tags"
 columns "git-diff-name" "show list of files in commit"
 columns "gw" "./gradlew"
 columns "docker-prune" "clean all docker containers, volumes and images"
+columns "couchbase-docker" "Start couchbase locally in docker"

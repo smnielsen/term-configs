@@ -23,11 +23,14 @@ BREW=(
   yarn
   git
   watchman
+  rabbitmq
+  mongodb
+  mysql
+  maven
   mas # Mac App Store installation CLI
   jpeg
   imagemagick
   pngquant
-  protobuf
 )
 
 CASK=(
@@ -40,6 +43,7 @@ CASK=(
   dropbox
   sizeup
   atom
+  mysqlworkbench
   iterm2
   sublime-text
   webstorm
@@ -69,6 +73,10 @@ YARN_GLOBAL=(
 MANUAL=(
   "Outlook;https://webmail.netlight.com"
 )
+
+###############################
+## PACKAGE EVALS
+echo "eval \"$(thefuck --alias)\"" >> .zshrc
 
 ###############################
 ## INSTALL ALL APPLICATIONS

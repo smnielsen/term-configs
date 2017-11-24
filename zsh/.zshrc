@@ -19,6 +19,7 @@ export EDITOR=/usr/bin/nano
 
 ### Set java8 as default
 export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
+export MAVEN_OPTS="-Xms512m -Xmx1024m"
 
 ### Load nvm
 export NVM_DIR="$HOME/.nvm"
@@ -27,11 +28,17 @@ export NVM_DIR="$HOME/.nvm"
 ### Add local bin path
 export PATH=/usr/local/bin:$PATH
 
+### Add sbin path
+export PATH=$PATH:/usr/local/sbin
+
 ### Add Python to PATH
 export PATH=$PATH:~/Library/Python/3.6/bin
 
 ### Add RVM to PATH for scripting
 export PATH="$PATH:$HOME/.rvm/bin"
+
+### THE FUCK
+eval "$(thefuck --alias)"
 
 ################################
 ## LOAD HELPER CONFIGS

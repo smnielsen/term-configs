@@ -12,8 +12,7 @@ alias gw='./gradlew'
 alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
 
 ## Couchbase
-alias couchbase-docker='docker run -t --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase/server:sandbox
-'
+alias couchbase-docker='docker run -t --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.1/server:sandbox'
 
 ## Print
 echo " ====   Aliases    ===="

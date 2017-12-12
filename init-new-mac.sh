@@ -31,6 +31,7 @@ BREW=(
   jpeg
   imagemagick
   pngquant
+  TomAnthony/brews/itermocil
 )
 
 CASK=(

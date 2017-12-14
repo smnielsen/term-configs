@@ -2,6 +2,11 @@ columns() {
   printf "%-15s | %-40s" ">> $1" "$2"
   echo ""
 }
+
+lson() {
+  local port=$1
+  sudo lsof -n -i:$port | grep LISTEN
+}
 ########################################
 # Global functions for terminal
 ########################################
@@ -22,4 +27,5 @@ dsh() {
 echo " ==== Help methods ===="
 columns "find-dirs-over" "find all dirs over 10GB recursively"
 columns "dsh" "Run docker exec. Ex: 'dsh dpo-auth'"
+columns "lson" "Network, listing on port $1"
 echo ""

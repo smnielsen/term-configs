@@ -1,0 +1,33 @@
+windows:
+  - name: Base
+    layout: tiled
+    root: ~/dev/
+    panes:
+      - name: leo-auth-service
+        commands:
+          - cd leo-auth-service && npm i
+          - npm run dev
+
+      - name: leo-api-gateway-service
+        commands:
+          - cd leo-api-gateway-service && npm i
+          - export LAS_URL=http://localhost:5007
+          - npm run dev
+
+      - name: leo-sports-client
+        commands:
+          - cd leo-sports-client && npm i
+          - npm run relay-watch & npm run dev
+
+      - name: leo-graphql
+        commands:
+          - cd leo-graphql && npm i && npm run dev
+
+      - name: fulcrum-frontend
+        commands:
+          - cd fulcrum-frontend/src/web
+          - npm i
+          - export LAGS_URL=http://127.0.0.1:5011 
+          - export LSC_URL=http://127.0.0.1:3030/static/sports-client 
+          - export GQL_URL=http://localhost:8000 
+          - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

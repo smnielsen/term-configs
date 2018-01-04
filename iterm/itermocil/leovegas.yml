@@ -36,6 +36,20 @@ windows:
           - npm i
           - npm run relay-watch & npm run dev
 
+      - name: leo-frontend-deprecated
+        commands:
+          - REPO=frontend; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd frontend
+          - git stash && git pull --rebase && git stash pop
+          - npm i
+          - export PORT=4000 
+          - export APP=mobile 
+          - export BACKEND=https://testing.leovegas.com 
+          - export LOCAL_SPORTS_CLIENT=true 
+          - export GQL_SERVER=http://localhost:8000 
+          - grunt --gruntfile apps/mobile/Gruntfile.js dev-build
+          - npm start
+
       - name: fulcrum-frontend
         commands:
           - REPO=fulcrum-frontend; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi

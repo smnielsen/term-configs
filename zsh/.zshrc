@@ -43,6 +43,9 @@ eval "$(thefuck --alias)"
 ################################
 ## LOAD HELPER CONFIGS
 
+### Load Dev Scripts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-dev
+
 ### Load Helpers
 source ${SMN_CONFIG_DIR}/zsh/.zsh-helpers
 

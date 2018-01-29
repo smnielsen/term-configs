@@ -1,0 +1,3 @@
+
+
+alias update-leo='. ~/config/dev/update-leo-repos.sh'

@@ -5,44 +5,60 @@ windows:
     panes:
       - name: leo-auth-service
         commands:
-          - REPO=leo-auth-service; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd leo-auth-service
-          - git stash && git pull --rebase && git stash pop
+          - export REPO=leo-auth-service
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd $REPO
+          - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
           - npm run dev
 
       - name: leo-api-gateway-service
         commands:
-          - REPO=leo-api-gateway-service; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd leo-api-gateway-service
-          - git stash && git pull --rebase && git stash pop
+          - export REPO=leo-api-gateway-service
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd $REPO
+          - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
           - export LAS_URL=http://localhost:5007
           - npm run dev
 
+      - name: leo-sports-event-service
+        commands:
+          - export REPO=leo-sports-event-service
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd $REPO
+          - git stash clear; git stash && git pull --rebase && git stash pop
+          - npm i
+          - export PORT=5002
+          - npm run dev
+
       - name: leo-graphql
         commands:
-          - REPO=leo-graphql; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd leo-graphql
-          - git stash && git pull --rebase && git stash pop
+          - export REPO=leo-graphql
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd $REPO
+          - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
+          - export LSES_URL=http://127.0.0.1:5002
           - npm run dev
 
       - name: leo-sports-client
         commands:
-          - REPO=leo-sports-client; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd leo-sports-client
-          - git stash && git pull --rebase && git stash pop
+          - export REPO=leo-sports-client
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - cd $REPO
+          - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
           - npm run relay-watch & npm run dev
 
       - name: fulcrum-frontend
         commands:
-          - REPO=fulcrum-frontend; if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
+          - export REPO=fulcrum-frontend
+          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd fulcrum-frontend/src/web
-          - git stash && git pull --rebase && git stash pop
+          - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
-          - export LAGS_URL=http://127.0.0.1:5011 
-          - export LSC_URL=http://127.0.0.1:3030/static/sports-client 
-          - export GQL_URL=http://localhost:8000 
+          - export LAGS_URL=http://127.0.0.1:5011
+          - export LSC_URL=http://127.0.0.1:3030/static/sports-client
+          - export GQL_URL=http://localhost:8000
           - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

@@ -3,7 +3,7 @@ columns() {
   echo ""
 }
 
-lson() {
+lookup-ns() {
   local port=$1
   sudo lsof -n -i:$port | grep LISTEN
 }

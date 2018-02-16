@@ -32,6 +32,9 @@ BREW=(
   imagemagick
   pngquant
   TomAnthony/brews/itermocil
+  couchdb
+  mongodb
+  mongoose
 )
 
 CASK=(

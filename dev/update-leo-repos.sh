@@ -49,6 +49,9 @@ runUpdate() {
         ERROR+=($repoName)
         goBack
         return 0
+    else
+        echo "-- Running npm install"
+        npm install
     fi
 
     # Reset stash if any
@@ -99,4 +102,3 @@ if [ ! ${#ERROR[@]} -eq 0 ]; then
         printRed "=> $i"
     done
 fi
-

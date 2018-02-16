@@ -40,6 +40,9 @@ export PATH="$PATH:$HOME/.rvm/bin"
 ### THE FUCK
 eval "$(thefuck --alias)"
 
+### CouchDB
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
+
 ################################
 ## LOAD HELPER CONFIGS
 

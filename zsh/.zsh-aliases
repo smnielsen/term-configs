@@ -12,7 +12,8 @@ alias gw='./gradlew'
 alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
 
 ## Couchbase
-alias couchbase-docker='docker run -t --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.1/server:sandbox'
+alias couchbase-create='docker run --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.1'
+alias couchbase-start='docker start db'
 
 ## Print
 echo " ====   Aliases    ===="
@@ -22,4 +23,5 @@ columns "git-tag-sort" "show sorted list of tags"
 columns "git-diff-name" "show list of files in commit"
 columns "gw" "./gradlew"
 columns "docker-prune" "clean all docker containers, volumes and images"
-columns "couchbase-docker" "Start couchbase locally in docker"
+columns "couchbase-create" "Create and start couchbase locally in docker"
+columns "couchbase-start" "Start couchbase locally"

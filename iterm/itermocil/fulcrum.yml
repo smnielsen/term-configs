@@ -3,24 +3,6 @@ windows:
     layout: tiled
     root: ~/dev/
     panes:
-      - name: leo-auth-service
-        commands:
-          - export REPO=leo-auth-service
-          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd $REPO
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
-          - npm run dev
-
-      - name: leo-api-gateway-service
-        commands:
-          - export REPO=leo-api-gateway-service
-          - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
-          - cd $REPO
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
-          - export LAS_URL=http://localhost:5007
-          - npm run dev
 
       - name: leo-sports-event-service
         commands:
@@ -28,7 +10,9 @@ windows:
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
+          - rm -rf node_modules && rm -rf package-lock.json && npm i
+          - export COUCHBASE=couchbase01.dev06.portal.rslon5.int.leovegas.net
+          - export LSS_URL=http://portal-lss.lb.dev06.portal.rslon5.int.leovegas.net
           - export PORT=5002
           - npm run dev
 
@@ -38,7 +22,7 @@ windows:
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
+          - rm -rf node_modules && rm -rf package-lock.json && npm i
           - export LSES_URL=http://127.0.0.1:5002
           - npm run dev
 
@@ -48,7 +32,8 @@ windows:
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
+          - rm -rf node_modules && rm -rf package-lock.json && npm i
+          - npm run relay
           - npm run relay-watch & npm run dev
 
       - name: fulcrum-frontend
@@ -58,7 +43,7 @@ windows:
           - cd fulcrum-frontend/src/web
           - git stash clear; git stash && git pull --rebase && git stash pop
           - npm i
-          - export LAGS_URL=http://127.0.0.1:5011
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
+          - npm run clean
           - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

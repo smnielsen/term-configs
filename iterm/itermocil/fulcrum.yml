@@ -9,10 +9,9 @@ windows:
           - export REPO=leo-sports-event-service
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - rm -rf node_modules && rm -rf package-lock.json && npm i
-          - export COUCHBASE=couchbase01.dev06.portal.rslon5.int.leovegas.net
-          - export LSS_URL=http://portal-lss.lb.dev06.portal.rslon5.int.leovegas.net
+          - nvm install && npm install --no-package-lock
+          - export COUCHBASE=couchbase01.dev04.portal.rslon5.int.leovegas.net
+          - export LSS_URL=http://portal-lss.lb.dev04.portal.rslon5.int.leovegas.net
           - export PORT=5002
           - npm run dev
 
@@ -21,8 +20,7 @@ windows:
           - export REPO=leo-graphql
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - rm -rf node_modules && rm -rf package-lock.json && npm i
+          - nvm install && npm install --no-package-lock
           - export LSES_URL=http://127.0.0.1:5002
           - npm run dev
 
@@ -31,8 +29,7 @@ windows:
           - export REPO=leo-sports-client
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - rm -rf node_modules && rm -rf package-lock.json && npm i
+          - nvm install && npm install --no-package-lock
           - npm run relay
           - npm run relay-watch & npm run dev
 
@@ -41,9 +38,7 @@ windows:
           - export REPO=fulcrum-frontend
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd fulcrum-frontend/src/web
-          - git stash clear; git stash && git pull --rebase && git stash pop
-          - npm i
+          - nvm install && npm install --no-package-lock && npm install -g concurrently && npm install -g relay-compiler
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
-          - npm run clean
           - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

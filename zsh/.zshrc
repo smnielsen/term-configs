@@ -23,7 +23,7 @@ export MAVEN_OPTS="-Xms512m -Xmx1024m"
 
 ### Load nvm
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+source $(brew --prefix nvm)/nvm.sh
 
 ### Add local bin path
 export PATH=/usr/local/bin:$PATH

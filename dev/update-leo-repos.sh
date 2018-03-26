@@ -16,8 +16,8 @@ printYellow() {
     local text=$1
     echo -e "\033[33m$text\033[0m"
 }
-
 goBack() {
+    printf " | ${runtime}"
     echo "--------------------"
     cd - > /dev/null
 }
@@ -27,32 +27,37 @@ UPDATED=()
 ERROR=()
 
 runUpdate() {
+    startin=$(date +%s)
     local repoName=$1
-    printBold " -- $repoName --"
     cd $repoName
-
-    # Check if branch is Master (only update master branches)
     branchName=$(git rev-parse --abbrev-ref HEAD)
-    if [[ $branchName != "master" ]]; then
-        printYellow "SKIP: Not on master"
-        SKIPPED+=($repoName)
+    printBold " -- $repoName ($branchName) --"
+
+    # Only update master and develop branches
+    if [[ $branchName != "master" ]] && [[ $branchName != *develop ]]; then
+        echo "SKIP: Not on master or develop"
+        SKIPPED+=("$repoName->$branchName")
         goBack
         return 0
     fi
+
+    # Change node and npm versions
+    nvm install
 
     # Stash anything
     WAS_STASHED=$(git stash)
 
     # Run the update
     if ! git pull --rebase; then
-        printRed "ERROR: Could not update!"
-        ERROR+=($repoName)
+        local msg=$?
+        printRed "ERROR: Could not update: $msg"
+        ERROR+=("$repoName->$msg")
         goBack
         return 0
-    else
-        echo "-- Running npm install"
-        npm install
     fi
+
+    printBold "$ Running npm install"
+    npm install --no-package-lock
 
     # Reset stash if any
     if [[ $WAS_STASHED != "No local changes to save" ]]; then
@@ -60,11 +65,16 @@ runUpdate() {
     fi
 
     # Successful
-    UPDATED+=($repoName)
+    endin=$(date +%s)
+    local time="$((($endin-$startin) / 60))m $((($endin-$startin) % 60))s"
+    UPDATED+=("$time: $repoName")
     printGreen "Update successful!"
+
     goBack
     return 0
 }
+
+start=$(date +%s)
 
 # Loop through all dirs
 echo "Updating repositories..."
@@ -102,3 +112,7 @@ if [ ! ${#ERROR[@]} -eq 0 ]; then
         printRed "=> $i"
     done
 fi
+echo "======================"
+
+end=$(date +%s)
+printBold "Total updatetime: $((($end-$start) / 60))m $((($end-$start) % 60))s"

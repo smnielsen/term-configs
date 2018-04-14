@@ -1,0 +1,68 @@
+########################################
+## Git / Version Handling
+########################################
+alias rebase='git fetch && git rebase'
+alias push='git push'
+alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
+alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
+
+########################################
+## Java + Gradlew
+########################################
+alias gw='./gradlew'
+
+########################################
+## Docker Helpers
+########################################
+alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
+
+########################################
+## Couchbase Helpers
+########################################
+alias couchbase-create='docker run --name db -p 8091-8094:8091-8094 -p 11210:11210 couchbase:community-4.5.1'
+alias couchbase-start='docker start db'
+
+########################################
+## Dev helpers
+########################################
+alias update-leo='. ~/config/dev/update-leo-repos.sh'
+
+########################################
+## Global functions for terminal
+########################################
+lookup-ns() {
+  local port=$1
+  sudo lsof -n -i:$port | grep LISTEN
+}
+# Shortcut to docker exec
+# Use dsh <container name> from the shell
+# You can optionally provide a command to
+# run inside the container, if you do not
+# the default command is /bin/sh.
+dsh() {
+  if [ ! -z "$2" ]; then
+    docker exec -it "$1" "${@:2}"
+  else
+    docker exec -it "$1" /bin/sh
+  fi
+}
+
+########################################
+## Print Helpers
+########################################
+columns() {
+  printf "%-15s | %-40s" ">> $1" "$2"
+  echo ""
+}
+
+echo " ====   Aliases    ===="
+columns "rebase" "git fetch && git rebase"
+columns "push" "git push"
+columns "git-tag-sort" "show sorted list of tags"
+columns "git-diff-name" "show list of files in commit. first param commithash"
+columns "gw" "./gradlew"
+columns "docker-prune" "clean all docker containers, volumes and images"
+columns "couchbase-create" "Create and start couchbase locally in docker"
+columns "couchbase-start" "Start couchbase locally"
+echo "==== LeoVegas ==="
+columns "update-leo" "Update repos starting with 'leo-'"

@@ -1,4 +1,4 @@
-
+start=$(date +%s)
 ##################################
 ## ZSH SETUP
 
@@ -37,9 +37,6 @@ export PATH=$PATH:~/Library/Python/3.6/bin
 ### Add RVM to PATH for scripting
 export PATH="$PATH:$HOME/.rvm/bin"
 
-### THE FUCK
-eval "$(thefuck --alias)"
-
 ### CouchDB
 export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
 
@@ -49,11 +46,11 @@ export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/
 ### Load Dev Scripts
 source ${SMN_CONFIG_DIR}/zsh/.zsh-dev
 
-### Load Helpers
-source ${SMN_CONFIG_DIR}/zsh/.zsh-helpers
-
-### Load ALIASES
-source ${SMN_CONFIG_DIR}/zsh/.zsh-aliases
+### Load Extensions
+source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 
 # Load Zgen
 source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
+
+end=$(date +%s)
+echo "==> $((($end-$start) % 60))s"

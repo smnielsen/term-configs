@@ -7,6 +7,11 @@ alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 
 ########################################
+## NPM Helpers
+########################################
+alias npm-reset='rm -rf node_modules && rm package-lock.json && nvm i && npm i'
+
+########################################
 ## Java + Gradlew
 ########################################
 alias gw='./gradlew'
@@ -51,7 +56,7 @@ dsh() {
 ## Print Helpers
 ########################################
 columns() {
-  printf "%-15s | %-40s" ">> $1" "$2"
+  printf "%-25s | %-40s" ">> $1" "$2"
   echo ""
 }
 
@@ -64,5 +69,6 @@ columns "gw" "./gradlew"
 columns "docker-prune" "clean all docker containers, volumes and images"
 columns "couchbase-create" "Create and start couchbase locally in docker"
 columns "couchbase-start" "Start couchbase locally"
+columns "npm-reset" "Reset node modules and npm install fresh"
 echo "==== LeoVegas ==="
 columns "update-leo" "Update repos starting with 'leo-'"

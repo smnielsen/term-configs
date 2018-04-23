@@ -30,7 +30,7 @@ alias update-leo='. ~/config/dev/update-leo-repos.sh'
 ########################################
 ## Global functions for terminal
 ########################################
-lookup-ns() {
+lookup-port() {
   local port=$1
   sudo lsof -n -i:$port | grep LISTEN
 }

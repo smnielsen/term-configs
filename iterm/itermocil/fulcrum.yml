@@ -41,4 +41,5 @@ windows:
           - nvm install && npm install --no-package-lock && npm install -g concurrently && npm install -g relay-compiler
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
+          - export LAGS_URL=http://portal-lags.lb.dev04.portal.rslon5.int.leovegas.net
           - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

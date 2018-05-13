@@ -9,7 +9,8 @@ alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 ########################################
 ## NPM Helpers
 ########################################
-alias npm-reset='rm -rf node_modules && rm -f package-lock.json && nvm i && npm i'
+alias npm-clean='rm -rf node_modules && rm -f package-lock.json'
+alias npm-reset='npm-clean && nvm i && npm i'
 
 ########################################
 ## Java + Gradlew

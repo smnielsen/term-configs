@@ -10,8 +10,8 @@ windows:
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - nvm install && npm install --no-package-lock
-          - export COUCHBASE=couchbase01.dev04.portal.rslon5.int.leovegas.net
-          - export LSS_URL=http://portal-lss.lb.dev04.portal.rslon5.int.leovegas.net
+          - export COUCHBASE=couchbase01.dev06.portal.rslon5.int.leovegas.net
+          - export LSS_URL=http://portal-lss.lb.dev06.portal.rslon5.int.leovegas.net
           - export PORT=5002
           - npm run dev
 
@@ -22,6 +22,8 @@ windows:
           - cd $REPO
           - nvm install && npm install --no-package-lock
           - export LSES_URL=http://127.0.0.1:5002
+          - export LSS_URL=http://portal-lss.lb.dev06.portal.rslon5.int.leovegas.net
+          - export LSPRS_URL=http://portal-lsprs.lb.dev06.portal.rslon5.int.leovegas.net
           - npm run dev
 
       - name: leo-sports-client
@@ -30,6 +32,7 @@ windows:
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - nvm install && npm install --no-package-lock
+          - npm run update-schema
           - npm run relay
           - npm run relay-watch & npm run dev
 
@@ -41,5 +44,5 @@ windows:
           - nvm install && npm install --no-package-lock && npm install -g concurrently && npm install -g relay-compiler
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
-          - export LAGS_URL=http://portal-lags.lb.dev04.portal.rslon5.int.leovegas.net
+          - export LAGS_URL=http://portal-lags.lb.dev06.portal.rslon5.int.leovegas.net
           - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr

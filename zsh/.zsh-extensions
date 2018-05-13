@@ -1,15 +1,15 @@
 ########################################
 ## Git / Version Handling
 ########################################
-alias rebase='git fetch && git rebase'
-alias push='git push'
+alias rebase='git stash && git fetch && git pull --rebase'
+alias push='git stash && git push'
 alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 
 ########################################
 ## NPM Helpers
 ########################################
-alias npm-reset='rm -rf node_modules && rm package-lock.json && nvm i && npm i'
+alias npm-reset='rm -rf node_modules && rm -f package-lock.json && nvm i && npm i'
 
 ########################################
 ## Java + Gradlew
@@ -61,8 +61,8 @@ columns() {
 }
 
 echo " ====   Aliases    ===="
-columns "rebase" "git fetch && git rebase"
-columns "push" "git push"
+columns "rebase" "Stash, fetch and rebase branch"
+columns "push" "Stash and push changes"
 columns "git-tag-sort" "show sorted list of tags"
 columns "git-diff-name" "show list of files in commit. first param commithash"
 columns "gw" "./gradlew"

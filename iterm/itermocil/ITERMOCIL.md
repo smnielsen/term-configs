@@ -16,9 +16,9 @@ $ brew install TomAnthony/brews/itermocil
 
 `$ mkdir ~/.itermocil`
 
-- cp itermocil configs
+- symlink itermocil config
 
-`$ cp ~/config/iterm/itermocil/*.yml ~/.itermocil/`
+`$ ln -s ~/config/iterm/itermocil/fulcrum.yml ~/.itermocil/fulcrum.yml`
 
 ## Usage
 - Run your configs with

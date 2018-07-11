@@ -1,16 +1,26 @@
 ########################################
 ## Git / Version Handling
 ########################################
-alias rebase='git stash && git fetch && git pull --rebase'
-alias push='git stash && git push'
+alias rebase='git stash; git fetch; git pull --rebase'
+alias push='git stash; git push'
 alias git-tag-sort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 
 ########################################
 ## NPM Helpers
 ########################################
-alias npm-clean='rm -rf node_modules && rm -f package-lock.json'
-alias npm-reset='npm-clean && nvm i && npm i'
+alias npm-clean='rm -rf node_modules; rm -f package-lock.json'
+alias npm-reset='npm-clean; nvm i; npm i'
+
+
+########################################
+## Kubernetes helpers
+########################################
+# $1 => dev-environment => dev95
+# $2 => Service full name => leo-sports-event-service
+# $3 => <pod-hash> =>
+alias k8s-logs="kubectl logs -n portal-$1 $2-$3 -f"
+alias k8s-config="kubectl describe -n portal-$1 configmap $2-config"
 
 ########################################
 ## Java + Gradlew

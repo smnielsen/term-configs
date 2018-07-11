@@ -9,6 +9,7 @@ windows:
           - export REPO=leo-sports-client
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
+          - git stash; git pull --rebase
           - nvm install && npm install --no-package-lock
           - npm run update-schema
           - npm run relay
@@ -19,9 +20,10 @@ windows:
           - export REPO=leo-sports-event-service
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
+          - git stash; git pull --rebase
           - nvm install && npm install --no-package-lock
-          - export COUCHBASE=couchbase01.stage03.portal.rslon5.int.leovegas.net
-          - export LSS_URL=http://portal-lss.lb.stage03.portal.rslon5.int.leovegas.net
+          - export COUCHBASE=couchbase01.stage01.portal.rslon.int.leovegas.net
+          - export LSS_URL=http://portal-lss.lb.stage01.portal.rslon.int.leovegas.net
           - export PORT=5002
           - npm run dev
 
@@ -30,10 +32,13 @@ windows:
           - export REPO=leo-graphql
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
+          - git stash; git pull --rebase
           - nvm install && npm install --no-package-lock
           - export LSES_URL=http://127.0.0.1:5002
-          - export LSS_URL=http://portal-lss.lb.stage03.portal.rslon5.int.leovegas.net
-          - export LSPRS_URL=http://portal-lsprs.lb.stage03.portal.rslon5.int.leovegas.net
+          - export COUCHBASE=couchbase01.stage01.portal.rslon.int.leovegas.net
+          - export LSS_URL=http://portal-lss.lb.stage01.portal.rslon.int.leovegas.net
+          - export LSPRS_URL=http://portal-lsprs.lb.stage01.portal.rslon.int.leovegas.net
+          - export LSDS_URL=http://portal-lsds.lb.stage01.portal.rslon.int.leovegas.net
           - npm run dev
 
       - name: fulcrum-frontend
@@ -41,8 +46,12 @@ windows:
           - export REPO=fulcrum-frontend
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd fulcrum-frontend/src/web
+          - git stash; git pull --rebase
           - nvm install && npm install --no-package-lock && npm install -g concurrently && npm install -g relay-compiler
+          - export FORCE_LOCALE=true
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
-          - export LAGS_URL=http://portal-lags.lb.stage03.portal.rslon5.int.leovegas.net
-          - npm run compile-gql-documents:watch & npm run dev-build & npm run dev-ssr
+          - export LAGS_URL=http://portal-lags.lb.stage01.portal.rslon.int.leovegas.net
+          - export LI18NS_URL=http://portal-li18ns.lb.stage01.portal.rslon.int.leovegas.net
+          - npm run compile-gql-documents
+          - npm run dev-build & npm run dev-ssr

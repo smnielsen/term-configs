@@ -22,6 +22,27 @@ goBack() {
     cd - > /dev/null
 }
 
+# Read process args
+
+SHOULD_RESET=
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        -r|--reset)
+        SHOULD_RESET="true"
+        printBold "ARG: Activating Reset to master for all branches"
+        shift # past argument
+        ;;
+        *)    # unknown option
+        printYellow "Unknown option: $key"
+        shift # past argument
+        ;;
+    esac
+done
+
+# Create update method
+
 SKIPPED=()
 UPDATED=()
 ERROR=()
@@ -34,11 +55,19 @@ runUpdate() {
     printBold " -- $repoName ($branchName) --"
 
     # Only update master and develop branches
+    
     if [[ $branchName != "master" ]] && [[ $branchName != *develop ]]; then
-        echo "SKIP: Not on master or develop"
-        SKIPPED+=("$repoName->$branchName")
-        goBack
-        return 0
+        if [ ! -z $SHOULD_RESET ]; then
+            echo "SKIP: Not on master or develop"
+            SKIPPED+=("$repoName->$branchName")
+            goBack
+            return 0
+        fi
+        echo "RESET: Stash and reset ${branchName} -> 'master'"
+        git stash
+        git fetch
+        git checkout master
+        git pull --rebase
     fi
 
     # Change node and npm versions

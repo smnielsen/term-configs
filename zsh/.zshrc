@@ -50,9 +50,6 @@ if [ -f '~/google-cloud-sdk/completion.bash.inc' ]; then source '~/google-cloud-
 ################################
 ## LOAD HELPER CONFIGS
 
-### Load Dev Scripts
-source ${SMN_CONFIG_DIR}/zsh/.zsh-dev
-
 ### Load Extensions
 source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 

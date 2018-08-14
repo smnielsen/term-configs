@@ -24,6 +24,7 @@ goBack() {
 
 # Read process args
 
+UPDATE_PREFIX="leo"
 SHOULD_RESET=
 while [[ $# -gt 0 ]]; do
     key="$1"
@@ -33,6 +34,12 @@ while [[ $# -gt 0 ]]; do
         SHOULD_RESET="true"
         printBold "ARG: Activating Reset to master for all branches"
         shift # past argument
+        ;;
+        -x|--prefix)
+        UPDATE_PREFIX=$2
+        printBold "PREFIX = ${UPDATE_PREFIX}"
+        shift # past argument
+        shift # past value
         ;;
         *)    # unknown option
         printYellow "Unknown option: $key"
@@ -67,11 +74,7 @@ runUpdate() {
         git stash
         git fetch
         git checkout master
-        git pull --rebase
     fi
-
-    # Change node and npm versions
-    nvm install
 
     # Stash anything
     WAS_STASHED=$(git stash)
@@ -85,8 +88,17 @@ runUpdate() {
         return 0
     fi
 
+    if [ -z $SHOULD_RESET ]; then
+        rm -rf node_modules
+        rm -rf package-lock.json
+    fi
+    
+    # Change node and npm versions
+    nvm install
+
+    # Install node_modules
     printBold "$ Running npm install"
-    npm install --no-package-lock
+    npm install
 
     # Reset stash if any
     if [[ $WAS_STASHED != "No local changes to save" ]]; then
@@ -104,11 +116,10 @@ runUpdate() {
 }
 
 start=$(date +%s)
-
 # Loop through all dirs
 echo "Updating repositories..."
 for f in *; do
-    if [[ -d $f ]] && [[ $f == leo* ]]; then
+    if [[ -d $f ]] && [[ $f == ${UPDATE_PREFIX}* ]]; then
         # $f is a directory
         runUpdate $f
     fi

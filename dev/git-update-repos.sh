@@ -70,14 +70,21 @@ runUpdate() {
             goBack
             return 0
         fi
-        echo "RESET: Stash and reset ${branchName} -> 'master'"
+        echo "-R $ Switching branches: ${branchName} -> 'master'"
         git stash
         git fetch
         git checkout master
     fi
 
-    # Stash anything
-    WAS_STASHED=$(git stash)
+    if [ ! -z $SHOULD_RESET ]; then
+        # Stash anything
+        echo "$ Stashing '${branchName}' changes"
+        WAS_STASHED=$(git stash)
+    else
+        # Reset branch
+        echo "-R $ Resetting '${branchName}' HEAD"
+        git checkout HEAD .
+    fi
 
     # Run the update
     if ! git pull --rebase; then
@@ -89,11 +96,13 @@ runUpdate() {
     fi
 
     if [ -z $SHOULD_RESET ]; then
+        echo "-R $ Removing node_modules && package-lock.json"
         rm -rf node_modules
         rm -rf package-lock.json
     fi
     
     # Change node and npm versions
+    printBold "$ Using node version from .nvmrc"
     nvm install
 
     # Install node_modules
@@ -102,6 +111,7 @@ runUpdate() {
 
     # Reset stash if any
     if [[ $WAS_STASHED != "No local changes to save" ]]; then
+        echo "$ Applying previous stash"
         git stash pop
     fi
 

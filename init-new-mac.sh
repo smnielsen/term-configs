@@ -85,7 +85,7 @@ echo "eval \"$(thefuck --alias)\"" >> .zshrc
 ###############################
 ## INSTALL ALL APPLICATIONS
 
-echo "# Setting up new Mac"
+echo "### Setting up new Mac"
 PREV_DIR=$(pwd)
 DIRNAME=$(dirname $0)
 cd ## Start in HOME dir
@@ -102,6 +102,7 @@ echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
 echo ">> Setting git global config"
 git config --global user.name "Simon Nielsen"
 git config --global user.email "simonmtnielsen@gmail.com"
+git config --global core.ignorecase false
 
 echo "## Homebrew - Terminal Apps"
 for program in "${BREW[@]}"; do

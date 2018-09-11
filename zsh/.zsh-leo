@@ -1,0 +1,58 @@
+alias update-leo='git-update --prefix leo'
+
+
+GCPURLS=(
+  "lags:leo-api-gateway-service"
+  "lffs:leo-frontend-fulcrum-service"
+  "gql:leo-graphql"
+  "lsprs:leo-sports-provider-service"
+  "lsps:leo-sports-popularity-service"
+  "lsds:leo-sports-discovery-service"
+  "lses:leo-sports-event-service"
+  "lsgs:leo-sports-graphql-service"
+  "lss:leo-settings-service"
+  "li18ns:leo-i18n-service"
+)
+
+leo-gcp-longname() {
+  local param=$1
+  local result=
+  for program in "${GCPURLS[@]}"; do
+    shortname=$(echo $program | cut -d':' -f 1)
+    longname=$(echo $program | cut -d':' -f 2)
+    if [ $param = $shortname ]; then
+      result=$longname
+    fi
+  done
+  echo $result
+}
+
+leo-gcp-print() {
+  for program in "${GCPURLS[@]}"; do
+    name=$(echo $program | cut -d':' -f 1)
+    url=$(echo $program | cut -d':' -f 2)
+    printf "%-8s : %-50s" "# $name" "$url"
+    echo ""
+  done
+}
+
+leo-gcp-url() {
+  local env=portal-$1;
+  local shortname=$2;
+  local longname=$(leo-gcp-longname $shortname)
+
+  echo "http://localhost:8001/api/v1/namespaces/${env}/services/${longname}/proxy/"
+}
+
+leo-gcp-env() {
+  local env=$1
+  local output=
+  for param in "$@"
+  do
+    result=$(leo-gcp-longname $param)
+    if [ ! -z "$result" ]; then 
+      output="${output}export $(echo $param | awk '{print toupper($0)}')_URL=$(leo-gcp-url $env $param) "
+    fi
+  done
+  echo $output
+}

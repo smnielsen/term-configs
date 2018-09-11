@@ -1,0 +1,33 @@
+##########
+## Google Cloud shortcuts
+##########
+# "gcpenv" will let you switch between the different GCP setups, `gcpenv leo-stage-italy`
+# "gcplags" will setup a local port-forward for the chosen environment, `gcplags portal-dev52` will allow you to use `http://localhost:5011` in your `.env` files as a LAGS url
+# "gcpcouch" works the same way as gcplags but for couchbase
+# "gcpproxy" is a generic function that lets you do `gcpproxy <env> <service> <port>` (e.g `gcpproxy portal-dev52 couchbase 8091`)
+# "gcplogs" will fetch logs for your service. `gcplogs portal-devXX leo-api-gateway-service` will fetch the last 200 logs, you can specify the number of logs with the optional third parameter `gcplogs portal-devXX leo-api-gateway-service 10` will limit it to the last 10 logs
+
+gcpenv () { 
+    gcloud config set project $1; 
+    gcloud container clusters get-credentials leo-frontend --zone europe-west1-c; 
+    kubectl config use-context gke_$1_europe-west1-c_leo-frontend;
+}
+#there is also kubectx and kubens that are installable with homebrew: https://github.com/ahmetb/kubectx
+gcpproxy () { 
+    local a=$1; local b=$2; local c=$3; 
+    eval $(kubectl -n $a get pods | grep $b | awk 'NR==1{printf "kubectl -n $a port-forward %s %s\n", $1, "$c:$c" }');
+}
+gcplags () { 
+    gcpproxy $1 leo-api-gateway-service- 5011;
+}
+gcpcouch () { 
+    gcpproxy $1 couchbase 8091;
+}
+gcplogs () { 
+    local a=$1; local b=$2; local c=${3:=200}; 
+    eval $(kubectl -n $a get pods | grep $b | awk 'NR==1{printf "kubectl -n $a logs %s -c $b --tail=$c\n", $1 }');
+}
+gcppods () {
+    local a=$1;
+    kubectl -n $a get pods;
+}

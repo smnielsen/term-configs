@@ -42,10 +42,16 @@ export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/
 
 ## Google Cloud
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f '~/google-cloud-sdk/path.bash.inc' ]; then source '~/google-cloud-sdk/path.bash.inc'; fi
+if [ -f "${HOME}/google-cloud-sdk/path.bash.inc" ]; then 
+    source "${HOME}/google-cloud-sdk/path.zsh.inc"
+fi
 
 # The next line enables shell command completion for gcloud.
-if [ -f '~/google-cloud-sdk/completion.bash.inc' ]; then source '~/google-cloud-sdk/completion.bash.inc'; fi
+if [ -f "${HOME}/google-cloud-sdk/completion.bash.inc" ]; then 
+    source "${HOME}/google-cloud-sdk/completion.zsh.inc"
+fi
+
+export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
 
 ################################
 ## LOAD HELPER CONFIGS
@@ -53,8 +59,14 @@ if [ -f '~/google-cloud-sdk/completion.bash.inc' ]; then source '~/google-cloud-
 ### Load Extensions
 source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 
+# Load Cloud Shortcuts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-cloud
+
 # Load Zgen
 source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
+
+# Load Zgen
+source ${SMN_CONFIG_DIR}/zsh/.zsh-leo
 
 end=$(date +%s)
 echo "==> $((($end-$start) % 60))s"

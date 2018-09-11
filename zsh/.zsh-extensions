@@ -42,7 +42,6 @@ alias couchbase-start='docker start db'
 ## Dev helpers
 ########################################
 alias git-update='. ~/config/dev/git-update-repos.sh'
-alias update-leo='git-update --prefix leo'
 
 ########################################
 ## Global functions for terminal

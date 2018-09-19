@@ -36,6 +36,8 @@ BREW=(
   couchdb
   mongodb
   mongoose
+  go
+  glide
 )
 
 CASK=(
@@ -139,6 +141,10 @@ for program in "${YARN_GLOBAL[@]}"; do
   yarn global add $program
 done
 echo ""
+
+###############################
+# Live Reloading GO applications
+go get -u github.com/codegangsta/gin
 
 ###############################
 echo ">>>> Finilized setting up Mac <<<<"

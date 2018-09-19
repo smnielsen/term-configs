@@ -37,6 +37,10 @@ export PATH=$PATH:~/Library/Python/3.6/bin
 ### Add RVM to PATH for scripting
 export PATH="$PATH:$HOME/.rvm/bin"
 
+### GOlang
+export GOPATH=$HOME/dev/go
+export PATH=$PATH:$(go env GOPATH)/bin
+
 ### CouchDB
 export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/pkgconfig
 

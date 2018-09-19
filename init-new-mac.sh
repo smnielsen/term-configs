@@ -143,7 +143,7 @@ done
 echo ""
 
 ###############################
-# Live Reloading GO applications
+# Setup GOLang
 go get -u github.com/codegangsta/gin
 
 ###############################

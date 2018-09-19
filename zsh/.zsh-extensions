@@ -64,7 +64,7 @@ dsh() {
 }
 
 # Fun times
-alias ascii-dunno="¯\_(ツ)_/¯"
+alias ascii-dunno='echo "¯\_(ツ)_/¯"'
 
 ########################################
 ## Print Helpers

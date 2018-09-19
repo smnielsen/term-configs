@@ -88,6 +88,9 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 # Load Cloud Shortcuts
 source ${SMN_CONFIG_DIR}/zsh/.zsh-cloud
 
+# Load Cloud Shortcuts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-git
+
 # Load Zgen
 source ${SMN_CONFIG_DIR}/zsh/clients/.zsh-leo
 

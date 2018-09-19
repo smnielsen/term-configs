@@ -39,9 +39,9 @@ alias couchbase-create='docker run --name db -p 8091-8094:8091-8094 -p 11210:112
 alias couchbase-start='docker start db'
 
 ########################################
-## Dev helpers
+## GIT helpers
 ########################################
-alias git-update='. ~/config/dev/git-update-repos.sh'
+alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
 
 ########################################
 ## Global functions for terminal
@@ -69,18 +69,18 @@ alias ascii-dunno='echo "¯\_(ツ)_/¯"'
 ########################################
 ## Print Helpers
 ########################################
-columns() {
-  printf "%-25s | %-40s" ">> $1" "$2"
-  echo ""
-}
+# columns() {
+#   printf "%-25s | %-40s" ">> $1" "$2"
+#   echo ""
+# }
 
-echo " ====   Aliases    ===="
-columns "rebase" "Stash, fetch and rebase branch"
-columns "push" "Stash and push changes"
-columns "git-tag-sort" "show sorted list of tags"
-columns "git-diff-name" "show list of files in commit. first param commithash"
-columns "gw" "./gradlew"
-columns "docker-prune" "clean all docker containers, volumes and images"
-columns "couchbase-create" "Create and start couchbase locally in docker"
-columns "couchbase-start" "Start couchbase locally"
-columns "npm-reset" "Reset node modules and npm install fresh"
+# echo " ====   Aliases    ===="
+# columns "rebase" "Stash, fetch and rebase branch"
+# columns "push" "Stash and push changes"
+# columns "git-tag-sort" "show sorted list of tags"
+# columns "git-diff-name" "show list of files in commit. first param commithash"
+# columns "gw" "./gradlew"
+# columns "docker-prune" "clean all docker containers, volumes and images"
+# columns "couchbase-create" "Create and start couchbase locally in docker"
+# columns "couchbase-start" "Start couchbase locally"
+# columns "npm-reset" "Reset node modules and npm install fresh"

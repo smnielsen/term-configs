@@ -1,6 +1,5 @@
 alias update-leo='git-update --prefix leo'
 
-
 GCPURLS=(
   "lags:leo-api-gateway-service"
   "lffs:leo-frontend-fulcrum-service"

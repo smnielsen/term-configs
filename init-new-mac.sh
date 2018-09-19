@@ -188,7 +188,7 @@ source ${HOME}.zshrc
 ###############################
 # Setup dev dirs
 mkdir -p ${HOME}/dev
-mkdir -p ${HOME}/dev/go
+mkdir -p ${HOME}/dev/go/src/github.com/smnielsen
 mkdir -p ${HOME}/dev/private
 mkdir -p ${HOME}/dev/netlight
 

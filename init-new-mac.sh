@@ -1,4 +1,16 @@
 #!/bin/bash
+start=$(date +%s)
+log() {
+  local t=$1
+  local end=$(date +%s)
+  printf "#\033[34;1m $t:\033[0m$((($end-$start)%60))s\n"
+}
+
+success() {
+  local t=$1
+  local end=$(date +%s)
+  printf "\r   \033[32;1m $t:\033[0m $((($end-$start)%60))s\n"
+}
 
 echoAll() {
   echo "### Homebrew"
@@ -83,68 +95,102 @@ MANUAL=(
 
 ###############################
 ## PACKAGE EVALS
-echo "eval \"$(thefuck --alias)\"" >> .zshrc
+log "Verifying .zshrc..."
+if [ ! -f ${HOME}/.zshrc ]; then
+  log "Missing .zshrc!"
+  log "Please use oh-my-zsh for this suite"
+  log "Installation guide: https://github.com/robbyrussell/oh-my-zsh"
+  exit 1
+fi
+success "oh-my-zsh is setup correctly"
 
-###############################
-## INSTALL ALL APPLICATIONS
-
-echo "### Setting up new Mac"
+log "Initialising new Mac"
 PREV_DIR=$(pwd)
 DIRNAME=$(dirname $0)
 cd ## Start in HOME dir
 
-echo ">> Installing Homebrew"
+log "Installing Homebrew"
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-echo ""
+success "Installed Homebrew"
 
-echo ">> Adding oh-my-zsh custom config"
+log "Setting up oh-my-zsh"
 echo "## Custom config from: https://github.com/smnielsen/config" >> .zshrc
 echo "export SMN_CONFIG_DIR=${DIRNAME}" >> .zshrc
 echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
+success "oh-my-zsh configured = .zshrc"
+cat ${HOME}.zshrc
+echo "-----"
 
-echo ">> Setting git global config"
+###############################
+## SETUP GIT CONFIG
+log "GIT - Global Config"
 git config --global user.name "Simon Nielsen"
 git config --global user.email "simonmtnielsen@gmail.com"
 git config --global core.ignorecase false
 
-echo "## Homebrew - Terminal Apps"
+###############################
+# SSH Creation and add
+if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then 
+  log "Create SSH key"
+  ssh-keygen
+  ssh-add
+  pbcopy < ~/.ssh/id_rsa.pub
+  printf ""
+  success "SSH done -> pubkey copied to clipboard"
+fi
+
+###############################
+## INSTALL ALL APPLICATIONS
+log "=== Homebrew - Terminal Apps ==="
 for program in "${BREW[@]}"; do
-  echo ">> $program"
-  brew install $program
+  log "Installing $program..."
+  brew install $program >> /dev/null
+  success "$program installed"
 done
 echo ""
 
-echo ">> Installing zgen"
+log "Installing zgen"
 git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
+success "Installed zgen"
 
-echo "## Homebrew Cask - Programs"
+log "=== Homebrew Cask - Programs ==="
 for program in "${CASK[@]}"; do
-  echo ">> $program"
-  brew cask install $program
+  log "Installing $program..."
+  brew cask $program >> /dev/null
+  success "$program installed"
 done
 echo ""
 
-echo "## Mac App Store - Applications"
+log "=== Mac App Store - Applications ==="
 for program in "${MAS[@]}"; do
   split=(${program//:/ })
   name=${split[0]}
   id=${split[1]}
-  printf "%-20s | %-20s" ">> $name" "$id"
-  echo ""
-  mas install $id
+
+  log "max install $name: $id"
+  mas install $id >> /dev/null
+  success "Installed $name: $id"
 done
 echo ""
 
-echo "## Yarn - Global Apps"
+log "=== Yarn - Global Apps ==="
 for program in "${YARN_GLOBAL[@]}"; do
-  echo ">> $program"
+  log "Yarn install $program..."
   yarn global add $program
+  success "$program installed"
 done
 echo ""
 
 ###############################
-# Setup GOLang
-go get -u github.com/codegangsta/gin
+# Load .zshrc
+source ${HOME}.zshrc
+
+###############################
+# Setup dev dirs
+mkdir -p ${HOME}/dev
+mkdir -p ${HOME}/dev/go
+mkdir -p ${HOME}/dev/private
+mkdir -p ${HOME}/dev/netlight
 
 ###############################
 echo ">>>> Finilized setting up Mac <<<<"

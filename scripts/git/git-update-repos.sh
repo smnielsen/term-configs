@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#/bin/bash
 
 printBold() {
     local text=$1
@@ -11,6 +11,10 @@ printRed() {
 printGreen() {
     local text=$1
     echo -e "\033[32m$text\033[0m"
+}
+printBlueBold() {
+    local text=$1
+    echo -e "\033[1;36m$text\033[0m"
 }
 printYellow() {
     local text=$1
@@ -26,6 +30,8 @@ goBack() {
 
 UPDATE_PREFIX="leo"
 SHOULD_RESET=
+IGNORE_NODE_MODULES=
+
 while [[ $# -gt 0 ]]; do
     key="$1"
 
@@ -33,6 +39,11 @@ while [[ $# -gt 0 ]]; do
         -r|--reset)
         SHOULD_RESET="true"
         printBold "ARG: Activating Reset to master for all branches"
+        shift # past argument
+        ;;
+        -im|--ignore-modules)
+        IGNORE_NODE_MODULES="true"
+        printBold "ARG: Ignore node modules"
         shift # past argument
         ;;
         -x|--prefix)
@@ -59,7 +70,7 @@ runUpdate() {
     local repoName=$1
     cd $repoName
     branchName=$(git rev-parse --abbrev-ref HEAD)
-    printBold " -- $repoName ($branchName) --"
+    printBlueBold " -- $repoName ($branchName) --"
 
     # Only update master and develop branches
     
@@ -76,13 +87,13 @@ runUpdate() {
         git checkout master
     fi
 
-    if [ ! -z $SHOULD_RESET ]; then
+    if [ -z ${SHOULD_RESET} ]; then
         # Stash anything
-        echo "$ Stashing '${branchName}' changes"
+        printBold "$ Stashing '${branchName}' changes"
         WAS_STASHED=$(git stash)
     else
         # Reset branch
-        echo "-R $ Resetting '${branchName}' HEAD"
+        printBold "$ Resetting '${branchName}' HEAD"
         git checkout HEAD .
     fi
 
@@ -95,19 +106,21 @@ runUpdate() {
         return 0
     fi
 
-    if [ -z $SHOULD_RESET ]; then
-        echo "-R $ Removing node_modules && package-lock.json"
+    if [ ! -z ${SHOULD_RESET} ]; then
+        printBold "$ Removing node_modules && package-lock.json"
         rm -rf node_modules
         rm -rf package-lock.json
     fi
     
-    # Change node and npm versions
-    printBold "$ Using node version from .nvmrc"
-    nvm install
+    if [ -z ${IGNORE_NODE_MODULES} ]; then
+        # Change node and npm versions
+        printBold "$ Setting Node version from .nvmrc"
+        nvm install
 
-    # Install node_modules
-    printBold "$ Running npm install"
-    npm install
+        # Install node_modules
+        printBold "$ Running npm install"
+        npm install
+    fi
 
     # Reset stash if any
     if [[ $WAS_STASHED != "No local changes to save" ]]; then

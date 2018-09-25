@@ -75,7 +75,7 @@ runUpdate() {
     # Only update master and develop branches
     
     if [[ $branchName != "master" ]] && [[ $branchName != *develop ]]; then
-        if [ ! -z $SHOULD_RESET ]; then
+        if [ -z $SHOULD_RESET ]; then
             echo "SKIP: Not on master or develop"
             SKIPPED+=("$repoName->$branchName")
             goBack

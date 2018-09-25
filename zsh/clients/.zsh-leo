@@ -1,22 +1,57 @@
+#!/bin/bash
 alias update-leo='git-update --prefix leo'
 
-GCPURLS=(
+echo_warn() {
+  local text=$1
+  echo -e "\033[33m$text\033[0m"
+}
+
+contains() {
+  local search=$1
+  local result="n"
+  while [[ $# -gt 0 ]]; do
+    shift
+    key="$1"
+    if [[ $search == $key ]]; then
+      result="y"
+    fi
+  done
+  echo $result
+}
+
+SERVICES=(
   "lags:leo-api-gateway-service"
-  "lffs:leo-frontend-fulcrum-service"
-  "gql:leo-graphql"
-  "lsprs:leo-sports-provider-service"
-  "lsps:leo-sports-popularity-service"
-  "lsds:leo-sports-discovery-service"
-  "lses:leo-sports-event-service"
-  "lsgs:leo-sports-graphql-service"
+  "lffs:leo-frontend-fulcrum-service:npm run compile-gql-documents; npm run dev-build & npm run dev-ssr"
+  "gql:leo-graphql:npm run dev"
+  "lsqs:leo-sports-graphql-service:npm run dev"
+  "lsprs:leo-sports-provider-service:npm run dev"
+  "lsps:leo-sports-popularity-service:npm run dev"
+  "lsds:leo-sports-discovery-service:npm run dev"
+  "lses:leo-sports-event-service:npm run dev"
   "lss:leo-settings-service"
   "li18ns:leo-i18n-service"
+  "lbcs:leo-blocked-countries-service"
+  "lseos:leo-seo-service"
+  "lpres:leo-payment-result-service"
+  "llcs:leo-language-config-service"
+  "lsc:leo-sports-client:npm run update-schema; npm run relay; npm run relay-watch & npm run dev"
+  "couchbase:couchbase"
 )
+
+leo-gcp-sports-client() {
+  echo "LSC_URL=http://portal-frontend-sport.lb.test01.portal.rslon.int.leovegas.net/static/sports-client"
+}
+
+leo-gcp-couchbase() {
+  local env=$1
+  local prefix=$2
+  echo "${prefix}${env}-couchbase-ui.leo-dev-shared.lvg-tech.net:8091"
+}
 
 leo-gcp-longname() {
   local param=$1
   local result=
-  for program in "${GCPURLS[@]}"; do
+  for program in "${SERVICES[@]}"; do
     shortname=$(echo $program | cut -d':' -f 1)
     longname=$(echo $program | cut -d':' -f 2)
     if [ $param = $shortname ]; then
@@ -26,8 +61,49 @@ leo-gcp-longname() {
   echo $result
 }
 
-leo-gcp-print() {
-  for program in "${GCPURLS[@]}"; do
+leo-gcp-script() {
+  local param=$1
+  local result=
+  for program in "${SERVICES[@]}"; do
+    shortname=$(echo $program | cut -d':' -f 1)
+    if [ $param = $shortname ]; then
+      script=$(echo $program | cut -d':' -f 3)
+      result=$script
+    fi
+  done
+  echo $result
+}
+
+leo-gcp-url() {
+  local env=$1;
+  local longname=$2;
+
+  if [ $longname == "leo-sports-client" ]; then
+    # We need to handle leo-sports-client differently
+    echo "something-sports-client:${env}-${longname}"
+  elif [ $longname == "couchbase" ]; then
+    leo-gcp-couchbase $env
+  else
+    echo "http://localhost:8001/api/v1/namespaces/portal-${env}/services/${longname}/proxy/"
+  fi
+}
+
+leo-gcp-env() {
+  local env=$1
+  local shortname=$2
+  local longname=$(leo-gcp-longname $shortname)
+  local uppershortname=$(echo $shortname | awk '{print toupper($0)}')
+  if [ ! -z $longname ]; then
+    if [[ $shortname == "couchbase" ]]; then
+      echo "${uppershortname}=$(leo-gcp-url $env $longname)"
+    else
+      echo "${uppershortname}_URL=$(leo-gcp-url $env $longname)"
+    fi
+  fi
+}
+
+leo-gcp-print-services() {
+  for program in "${SERVICES[@]}"; do
     name=$(echo $program | cut -d':' -f 1)
     url=$(echo $program | cut -d':' -f 2)
     printf "%-8s : %-50s" "# $name" "$url"
@@ -35,23 +111,103 @@ leo-gcp-print() {
   done
 }
 
-leo-gcp-url() {
-  local env=portal-$1;
-  local shortname=$2;
-  local longname=$(leo-gcp-longname $shortname)
-
-  echo "http://localhost:8001/api/v1/namespaces/${env}/services/${longname}/proxy/"
-}
-
-leo-gcp-env() {
+leo-gcp-dot-env() {
   local env=$1
-  local output=
-  for param in "$@"
+  local file=$2
+  local type=${3:-DOT_ENV}
+  local prefix=
+  while getopts i: option
   do
-    result=$(leo-gcp-longname $param)
-    if [ ! -z "$result" ]; then 
-      output="${output}export $(echo $param | awk '{print toupper($0)}')_URL=$(leo-gcp-url $env $param) "
-    fi
+    case "${option}" in
+      i) IGNORE="${OPTARG}" ;;
+    esac
   done
-  echo $output
+
+  if [[ $type == "DOT_ENV" ]]; then
+    echo "## Below will be a complete .env file to replace the current one with."
+    echo "-----------------------"
+  elif [[ $type == "START" ]]; then
+    prefix="export "
+  fi
+
+  if [ -f $file ]; then
+    while IFS='' read -r line || [[ -n "$line" ]]; do
+        name=$(echo $line | cut -d'=' -f 1)
+        url=$(echo $line | cut -d'=' -f 2)
+        shortname=$(echo $name | cut -d'_' -f 1 | awk '{print tolower($0)}')
+
+        if [ $(contains $shortname $IGNORE ) == "y" ]; then
+          # Ignore these
+          echo_warn "Ignoring $shortname"
+          continue
+        fi
+
+        isURL=$(echo $name | cut -d'_' -f 2)
+        if [[ $isURL == "URL" ]] || [[ $shortname == "couchbase" ]]; then
+          GCP_URL=$(leo-gcp-env $env $shortname)
+          if [ ! -z ${GCP_URL} ]; then
+            echo "$prefix$GCP_URL"
+            eval "$prefix$GCP_URL"
+          elif [[ $type == "DOT_ENV" ]]; then
+            echo_warn "# ${shortname}: Missing longname. Please add to array."
+          fi
+        elif [[ $type == "DOT_ENV" ]];then
+          echo "${line}"
+        fi
+    done < "$file"
+  fi
 }
+
+get-npm-package-shortname() {
+  # Version key/value should be on his own line
+  PACKAGE_VERSION=$(cat package.json \
+    | grep shortName \
+    | head -1 \
+    | awk -F: '{ print $2 }' \
+    | sed 's/[",]//g' \
+    | sed -e 's/^[[:space:]]*//')
+
+  echo $PACKAGE_VERSION
+}
+
+###################################################
+## EVERYTHING ABOVE THIS LINE ARE HELPERS
+###################################################
+leo-gcp-envs() {
+  local env=$1
+  leo-gcp-dot-env $env "$(pwd)/.env" "START" -i $2
+}
+
+leo-gcp-start() {
+  local ENV
+  local IGNORE=()
+  while getopts i:e: option
+  do
+    case "${option}" in
+      i) IGNORE+="${OPTARG} " ;;
+      e) ENV=${OPTARG} ;;
+    esac
+  done
+
+  leo-gcp-envs $ENV $IGNORE
+  local shortname=$(get-npm-package-shortname)
+  local script=$(leo-gcp-script $shortname)
+
+  echo "# Environment: '${ENV}'"
+  echo "# Service: '$shortname'"
+
+  if [ ! -z "$script" ]; then
+    echo "$ Command: $script"
+    eval $script
+  fi
+}
+
+# get-npm-package-version
+
+# leo-gcp-start -e dev94
+
+# leo-gcp-envs dev94 lsds lss lsprs couchbase
+
+# leo-gcp-export portal-dev94
+
+# leo-gcp-dot-env dev94 /Users/simon.nielsen/dev/leo-sports-graphql-service/.env

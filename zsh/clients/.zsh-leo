@@ -23,7 +23,7 @@ SERVICES=(
   "lags:leo-api-gateway-service"
   "lffs:leo-frontend-fulcrum-service:npm run compile-gql-documents; npm run dev-build & npm run dev-ssr"
   "gql:leo-graphql:npm run dev"
-  "lsqs:leo-sports-graphql-service:npm run dev"
+  "lsgs:leo-sports-graphql-service:npm run dev"
   "lsprs:leo-sports-provider-service:npm run dev"
   "lsps:leo-sports-popularity-service:npm run dev"
   "lsds:leo-sports-discovery-service:npm run dev"
@@ -146,7 +146,9 @@ leo-gcp-dot-env() {
         if [[ $isURL == "URL" ]] || [[ $shortname == "couchbase" ]]; then
           GCP_URL=$(leo-gcp-env $env $shortname)
           if [ ! -z ${GCP_URL} ]; then
-            echo "$prefix$GCP_URL"
+            if [[ $type != "START" ]]; then
+              echo "$prefix$GCP_URL"
+            fi
             eval "$prefix$GCP_URL"
           elif [[ $type == "DOT_ENV" ]]; then
             echo_warn "# ${shortname}: Missing longname. Please add to array."

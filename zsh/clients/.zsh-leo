@@ -113,13 +113,17 @@ leo-gcp-print-services() {
 
 leo-gcp-dot-env() {
   local env=$1
-  local file=$2
-  local type=${3:-DOT_ENV}
+  local file="$(pwd)/.env"
+  local type="DOT_ENV"
+  local ignore=()
   local prefix=
-  while getopts i: option
+  while getopts e:t:i:f: option
   do
     case "${option}" in
-      i) IGNORE="${OPTARG}" ;;
+      e) env="${OPTARG}" ;;
+      t) type="${OPTARG}" ;;
+      i) ignore="${OPTARG}" ;;
+      f) file="${OPTARG}" ;;
     esac
   done
 
@@ -130,13 +134,17 @@ leo-gcp-dot-env() {
     prefix="export "
   fi
 
+  if [ -z $file ]; then
+    file="$(pwd)/.env"
+  fi
+
   if [ -f $file ]; then
     while IFS='' read -r line || [[ -n "$line" ]]; do
         name=$(echo $line | cut -d'=' -f 1)
         url=$(echo $line | cut -d'=' -f 2)
         shortname=$(echo $name | cut -d'_' -f 1 | awk '{print tolower($0)}')
 
-        if [ $(contains $shortname $IGNORE ) == "y" ]; then
+        if [ $(contains $shortname $ignore ) == "y" ]; then
           # Ignore these
           echo_warn "Ignoring $shortname"
           continue
@@ -176,40 +184,50 @@ get-npm-package-shortname() {
 ## EVERYTHING ABOVE THIS LINE ARE HELPERS
 ###################################################
 leo-gcp-envs() {
-  local env=$1
-  leo-gcp-dot-env $env "$(pwd)/.env" "START" -i $2
+  local env="testing"
+  local type="DOD_ENV"
+  local ignore=("none")
+  while getopts e:t:i: option
+  do
+    case "${option}" in
+      e) env=${OPTARG} ;;
+      t) type=${OPTARG} ;;
+      i) ignore+="${OPTARG} ";;
+    esac
+  done
+  leo-gcp-dot-env -e $env -f "$(pwd)/.env" -t ${type} -i $ignore
 }
 
 leo-gcp-start() {
-  local ENV
-  local IGNORE=()
+  local env=
+  local ignore=("none")
   while getopts i:e: option
   do
     case "${option}" in
-      i) IGNORE+="${OPTARG} " ;;
-      e) ENV=${OPTARG} ;;
+      i) ignore+="${OPTARG} " ;;
+      e) env=${OPTARG} ;;
     esac
   done
 
-  leo-gcp-envs $ENV $IGNORE
   local shortname=$(get-npm-package-shortname)
   local script=$(leo-gcp-script $shortname)
 
-  echo "# Environment: '${ENV}'"
+  echo "# Environment: '${env}'"
   echo "# Service: '$shortname'"
+
+  leo-gcp-envs -e $env -t "START" -i $ignore
 
   if [ ! -z "$script" ]; then
     echo "$ Command: $script"
     eval $script
   fi
 }
+## USAGE
 
-# get-npm-package-version
+#leo-gcp-start -e dev94
 
-# leo-gcp-start -e dev94
-
-# leo-gcp-envs dev94 lsds lss lsprs couchbase
+# leo-gcp-envs -e dev94
 
 # leo-gcp-export portal-dev94
 
-# leo-gcp-dot-env dev94 /Users/simon.nielsen/dev/leo-sports-graphql-service/.env
+# leo-gcp-dot-env dev94

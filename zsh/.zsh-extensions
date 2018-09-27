@@ -12,6 +12,17 @@ alias git-diff-name="git diff-tree --no-commit-id --name-only -r $1"
 alias npm-clean='rm -rf node_modules; rm -f package-lock.json'
 alias npm-reset='npm-clean; nvm i; npm i'
 
+npm-install-global() {
+  local package=$1 # @scope/concurrently
+  local program=$(echo $package | awk -F/ '{print $NF}')
+  if [ ! -z $splitlast ] && [ $(where ${program}) != "${program} not found"]; then
+    # npm install -g concurrently
+    echo "$ Installing ${package} Globally"
+    npm install -g $package
+  else
+    echo "$ ${package} already installed"
+  fi
+}
 
 ########################################
 ## Kubernetes helpers

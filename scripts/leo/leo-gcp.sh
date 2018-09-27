@@ -22,6 +22,7 @@ LEO_GCP_SERVICES=(
 leo-gcp-start() {
   local shortname=$(get-npm-package-shortname)
   local script=$(private-leo-gcp-script $shortname)
+  local defaultscript="npm run dev"
 
   echo "# Service: '$shortname'"
 

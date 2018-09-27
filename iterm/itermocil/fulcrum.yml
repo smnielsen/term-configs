@@ -24,10 +24,10 @@ windows:
           - export PORT=5002
           - leo-gcp-start -e $DEV_ENV
 
-      - name: leo-sports-graphql-service
+      - name: leo-graphql
         commands:
           - export DEV_ENV=dev94
-          - export REPO=leo-sports-graphql-service
+          - export REPO=leo-graphql
           - if [ ! -d "$REPO" ]; then echo "Missing $REPO. Cloning..."; git clone git@github.com:gutro/$REPO.git; fi
           - cd $REPO
           - npm install -g nodemon
@@ -45,5 +45,5 @@ windows:
           - nvm i; npm i
           - export FORCE_LOCALE=true
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
-          - export LSQS_URL=http://localhost:8000
+          - export GQL_URL=http://localhost:8000
           - leo-gcp-start -e $DEV_ENV -i lsc -i lsqs -i lffs

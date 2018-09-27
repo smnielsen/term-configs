@@ -1,6 +1,4 @@
 alias update-leo='git-update --prefix leo'
 
-alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
-
 alias leo-gcp-envs="$SMN_CONFIG_DIR/scripts/leo/leo-gcp.sh -m envs $@"
 alias leo-gcp-start="$SMN_CONFIG_DIR/scripts/leo/leo-gcp.sh -m start $@"

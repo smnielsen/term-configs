@@ -91,9 +91,6 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-cloud
 # Load Cloud Shortcuts
 source ${SMN_CONFIG_DIR}/zsh/.zsh-git
 
-# Load Zgen
-source ${SMN_CONFIG_DIR}/zsh/clients/.zsh-leo
-
 loaded "zsh-sources"
 # Load Zgen
 loading "zgen"

@@ -3,7 +3,9 @@
 ##########
 # "gcpenv" will let you switch between the different GCP setups, `gcpenv leo-stage-italy`
 # "gcplags" will setup a local port-forward for the chosen environment, `gcplags portal-dev52` will allow you to use `http://localhost:5011` in your `.env` files as a LAGS url
-# "gcpcouch" works the same way as gcplags but for couchbase
+# "gcpcouch" works the same way as gcplags but for couchbase port 8091
+# "gcpcouch2" works the same way as gcplags but for couchbase port 11210
+# "gcpcouch-all" starts both 1 and 2 of gcpcouch
 # "gcpproxy" is a generic function that lets you do `gcpproxy <env> <service> <port>` (e.g `gcpproxy portal-dev52 couchbase 8091`)
 # "gcplogs" will fetch logs for your service. `gcplogs portal-devXX leo-api-gateway-service` will fetch the last 200 logs, you can specify the number of logs with the optional third parameter `gcplogs portal-devXX leo-api-gateway-service 10` will limit it to the last 10 logs
 
@@ -22,6 +24,12 @@ gcplags () {
 }
 gcpcouch () { 
     gcpproxy $1 couchbase 8091;
+}
+gcpcouch2 () { 
+    gcpproxy $1 couchbase 11210;
+}
+gcpcouch-all () {
+    gcpcouch $1 & gcpcouch2 $1
 }
 gcplogs () { 
     local a=$1; local b=$2; local c=${3:=200}; 

@@ -46,4 +46,4 @@ windows:
           - export FORCE_LOCALE=true
           - export LSC_URL=http://127.0.0.1:3030/static/sports-client
           - export GQL_URL=http://localhost:8000
-          - leo-gcp-start -e $DEV_ENV -i lsc -i lsqs -i lffs
+          - leo-gcp-start -e $DEV_ENV -i lsc -i gql -i lffs

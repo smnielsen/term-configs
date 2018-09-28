@@ -1,73 +1,9 @@
 #!/bin/bash
 
-LEO_GCP_SERVICES=(
-  "lags:leo-api-gateway-service"
-  "lffs:leo-fulcrum-frontend-service:npm run compile-gql-documents; npm run dev-build & npm run dev-ssr"
-  "gql:leo-graphql"
-  "lsgs:leo-sports-graphql-service"
-  "lsprs:leo-sports-provider-service"
-  "lsps:leo-sports-popularity-service"
-  "lsds:leo-sports-discovery-service"
-  "lses:leo-sports-event-service"
-  "lss:leo-settings-service"
-  "li18ns:leo-i18n-service"
-  "lbcs:leo-blocked-countries-service"
-  "lseos:leo-seo-service"
-  "lpres:leo-payment-result-service"
-  "llcs:leo-language-config-service"
-  "lsc:leo-sports-client:npm run update-schema; npm run relay; npm run relay-watch & npm run dev"
-  "couchbase:couchbase"
-)
-
-leo-gcp-start() {
-  local shortname=$(get-npm-package-shortname)
-  local script=$(private-leo-gcp-script $shortname)
-  local defaultscript="npm run dev"
-
-  echo "# Service: '$shortname'"
-
-  leo-gcp-envs -t "START" $@
-
-  if [ ! -z "$script" ]; then
-    echo "$ Command: $script"
-    eval $script
-  else
-    echo "$ Default command: $defaultscript"
-    eval $defaultscript
-  fi
-}
-
-leo-gcp-envs() {
-  local env=
-  local type="DOT_ENV"
-  local ignore=("none")
-
-  while getopts ":e:t:i:f:" option; do
-    case ${option} in
-      e) env=${OPTARG} ;;
-      t) type=${OPTARG} ;;
-      i) ignore+=" ${OPTARG}";;
-      \?) echo "Invalid option: -$OPTARG" ;;
-    esac
-  done
-  local file="$(pwd)/.env"
-  echo "# Environment: '${env}'"
-  echo "# Ignore: '${ignore}'"
-
-  if [ -z $env ]; then
-    echo_warn "env= is not set. Use -e to set env (ex: -e dev94)"
-    exit 1
-  fi
-
-  if [ -z $file ]; then
-    file="$(pwd)/.env"
-    echo_warn "file= is not set. Defaulting to: $file"
-  fi
-
-  private-leo-gcp-run $env $file ${type} "$ignore"
-}
-
 ###################################################
+## You can find the exposed methods below the helpers
+## Scroll down!
+##
 ## WARNING:
 ## EVERYTHING BELOW THIS LINE IS HELPERS
 ## IF YOU CHANGE ANYTHING, REMEMBER TO CHANGE EVERYWHERE!
@@ -95,8 +31,14 @@ private-leo-gcp-run() {
         containsResult=$(contains $shortname "$ignore" )
         if [[ $containsResult == "y" ]]; then
           # Ignore these
-          echo_warn "# Ignored '$shortname'. Using default URL."
-          echo "$line"
+          original=${!name}
+          if [ ! -z $original ]; then
+            echo_warn "# Ignored '$shortname'. Using env URL."
+            echo "${name}=$original"
+          else
+            echo_warn "# Ignored '$shortname'. Using default URL."
+            echo $line
+          fi
           continue
         fi
 
@@ -164,11 +106,13 @@ private-leo-gcp-url() {
   local env=$1;
   local longname=$2;
 
-  if [ $longname == "leo-sports-client" ]; then
+  if [[ $longname == "leo-sports-client" ]]; then
     # We need to handle leo-sports-client differently
-    echo "http://portal-frontend-sport.lb.test01.portal.rslon.int.leovegas.net/static/sports-client"
-  elif [ $longname == "couchbase" ]; then
-    echo "${env}-couchbase-ui.leo-dev-shared.lvg-tech.net:8091"
+    echo "https://${env}-leo-frontend.leo-dev-shared.lvg-tech.net/static/sports-client"
+  elif [[ $longname == "leo-api-gateway-service" ]]; then
+    echo "http://localhost:5011"
+  elif [[ $longname == "couchbase" ]]; then
+    echo "127.0.0.1:8091"
   else
     echo "http://localhost:8001/api/v1/namespaces/portal-${env}/services/${longname}/proxy/"
   fi
@@ -208,6 +152,107 @@ get-npm-package-shortname() {
 
   echo $PACKAGE_VERSION
 }
+##########################################
+## Below this line you find any exposed
+## methods and the list of services supported
+## - Add service if missing
+##########################################
+
+LEO_GCP_SERVICES=(
+  "lags:leo-api-gateway-service"
+  "lffs:leo-fulcrum-frontend-service:npm run compile-gql-documents; npm run dev-build & npm run dev-ssr"
+  "gql:leo-graphql"
+  "lsgs:leo-sports-graphql-service"
+  "lsprs:leo-sports-provider-service"
+  "lsps:leo-sports-popularity-service"
+  "lsds:leo-sports-discovery-service"
+  "lses:leo-sports-event-service"
+  "lss:leo-settings-service"
+  "li18ns:leo-i18n-service"
+  "lbcs:leo-blocked-countries-service"
+  "lseos:leo-seo-service"
+  "lpres:leo-payment-result-service"
+  "llcs:leo-language-config-service"
+  "lsc:leo-sports-client:npm run update-schema; npm run relay; npm run relay-watch & npm run dev"
+  "couchbase:couchbase"
+)
+
+leo-gcp-start() {
+  local shortname=$(get-npm-package-shortname)
+  local script=$(private-leo-gcp-script $shortname)
+  local defaultscript="npm run dev"
+
+  echo "# Service: '$shortname'"
+
+  leo-gcp-envs -t "START" $@
+
+  if [ ! -z "$script" ]; then
+    echo "$ Command: $script"
+    eval $script
+  else
+    echo "$ Default command: $defaultscript"
+    eval $defaultscript
+  fi
+}
+
+leo-gcp-envs() {
+  local env=
+  local type="DOT_ENV"
+  local ignore=("none")
+
+  while getopts ":e:t:i:f:" option; do
+    case ${option} in
+      e) env=${OPTARG} ;;
+      t) type=${OPTARG} ;;
+      i) ignore+=" ${OPTARG}";;
+      \?) echo "Invalid option: -$OPTARG" ;;
+    esac
+  done
+  local file="$(pwd)/.env"
+  echo "# Environment: '${env}'"
+  echo "# Ignore: '${ignore}'"
+
+  if [ -z $env ]; then
+    echo_warn "env= is not set. Use -e to set env (ex: -e dev94)"
+    exit 1
+  fi
+
+  if [ -z $file ]; then
+    file="$(pwd)/.env"
+    echo_warn "file= is not set. Defaulting to: $file"
+  fi
+
+  private-leo-gcp-run $env $file ${type} "$ignore"
+}
+
+leo-gcp-help() {
+cat << EOF
+  For easier handling of kubernetes environments 
+  and setting up development locally.
+
+# General information
+  Please read README.md in leo-gcp-helpers for more information.
+
+# Commands
+  $ leo-gcp-help
+
+  $ leo-gcp-envs
+  Lists a new .env file with updated URLs.
+  Options:
+    -e          Environment
+    -i          Ignore these services, list with shortname. Multiple possible. 
+
+  $ leo-gcp-start
+  Starts the service with updated URLs
+    -e          Environment
+    -i          Ignore these services, list with shortname. Multiple possible.
+
+EOF
+}
+
+###########################################
+## RUNNER IS BELOW
+###########################################
 
 METHOD=
 PARAMS=
@@ -228,18 +273,10 @@ while [[ $# -gt 0 ]]
   esac
 done
 
-echo "METHOD=$METHOD"
-echo "PARAMS=$PARAMS"
-
 case "${METHOD}" in
   start) leo-gcp-start $PARAMS ;;
   envs) leo-gcp-envs $PARAMS ;;
+  help) leo-gcp-help ;;
 esac
 
 exit 0
-## USAGE
-### Prints a .env file with the updated URLS for k8s
-# /leo-gcp.sh -m envs -e dev94 -i lsc -i lsqs -i lffs
-
-## Starts the application with exported URLS for k8s
-# /leo-gcp.sh -m start -e dev94 -i lsc -i lsqs -i lffs

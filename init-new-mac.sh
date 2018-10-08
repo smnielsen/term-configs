@@ -50,6 +50,7 @@ BREW=(
   mongoose
   go
   glide
+  unrar
 )
 
 CASK=(

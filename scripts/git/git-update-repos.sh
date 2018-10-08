@@ -28,7 +28,7 @@ goBack() {
 
 # Read process args
 
-UPDATE_PREFIX="leo"
+UPDATE_PREFIX=""
 SHOULD_RESET=
 IGNORE_NODE_MODULES=
 
@@ -48,7 +48,6 @@ while [[ $# -gt 0 ]]; do
         ;;
         -x|--prefix)
         UPDATE_PREFIX=$2
-        printBold "PREFIX = ${UPDATE_PREFIX}"
         shift # past argument
         shift # past value
         ;;
@@ -59,6 +58,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+printBold "PREFIX = ${UPDATE_PREFIX}"
 # Create update method
 
 SKIPPED=()
@@ -114,8 +114,13 @@ runUpdate() {
     
     if [ -z ${IGNORE_NODE_MODULES} ]; then
         # Change node and npm versions
-        printBold "$ Setting Node version from .nvmrc"
-        nvm install
+        if [ -f ".nvmrc" ]; then
+            printBold "$ Node version: from .nvmrc"
+            nvm install
+        else
+            printBold "$ Node version: 10.*"
+            nvm install 10
+        fi
 
         # Install node_modules
         printBold "$ Running npm install"

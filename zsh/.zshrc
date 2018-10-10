@@ -78,6 +78,13 @@ fi
 export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
 
 loaded "google-cloud"
+
+### Load Kubernetes and Minikube
+loading "kubernetes"
+
+eval $(minikube docker-env)
+
+loaded "kubernetes"
 ################################
 ## LOAD HELPER CONFIGS
 

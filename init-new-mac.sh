@@ -51,6 +51,9 @@ BREW=(
   go
   glide
   unrar
+  kubernetes-helm
+  azure-cli
+  python3
 )
 
 CASK=(
@@ -71,6 +74,7 @@ CASK=(
   skitch
   android-studio
   java
+  minikube
 )
 
 MAS=(

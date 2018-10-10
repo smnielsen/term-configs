@@ -37,5 +37,9 @@ gcplogs () {
 }
 gcppods () {
     local a=$1;
-    kubectl -n $a get pods;
+    if [ ! -z $a ]; then
+        kubectl -n $a get pods;
+    else 
+        kubectl get pods --all-namespaces;
+    fi
 }

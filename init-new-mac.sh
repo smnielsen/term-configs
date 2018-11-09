@@ -54,6 +54,7 @@ BREW=(
   kubernetes-helm
   azure-cli
   python3
+  mosquitto
 )
 
 CASK=(
@@ -75,6 +76,7 @@ CASK=(
   android-studio
   java
   minikube
+  pgadmin4
 )
 
 MAS=(

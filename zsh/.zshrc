@@ -35,6 +35,15 @@ export EDITOR=/usr/bin/nano
 export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 export MAVEN_OPTS="-Xms512m -Xmx1024m"
 
+# Set PYTHONPATH
+export PYTHONPATH=usr/bin
+
+# Android
+export PATH=/usr/local/android-platform-tools:$PATH
+
+# Mosquitto MQTT Broker
+export PATH=/usr/local/opt/mosquitto/bin:$PATH
+
 ### Add local bin path
 export PATH=/usr/local/bin:$PATH
 
@@ -66,7 +75,7 @@ loaded "nvm"
 ## Google Cloud
 loading "google-cloud"
 # The next line updates PATH for the Google Cloud SDK.
-if [ -f "${HOME}/google-cloud-sdk/path.bash.inc" ]; then 
+if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then 
     source "${HOME}/google-cloud-sdk/path.zsh.inc"
 fi
 
@@ -80,11 +89,11 @@ export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
 loaded "google-cloud"
 
 ### Load Kubernetes and Minikube
-loading "kubernetes"
+#loading "kubernetes"
 
-eval $(minikube docker-env)
+#eval $(minikube docker-env)
 
-loaded "kubernetes"
+#loaded "kubernetes"
 ################################
 ## LOAD HELPER CONFIGS
 

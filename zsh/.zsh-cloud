@@ -9,37 +9,86 @@
 # "gcpproxy" is a generic function that lets you do `gcpproxy <env> <service> <port>` (e.g `gcpproxy portal-dev52 couchbase 8091`)
 # "gcplogs" will fetch logs for your service. `gcplogs portal-devXX leo-api-gateway-service` will fetch the last 200 logs, you can specify the number of logs with the optional third parameter `gcplogs portal-devXX leo-api-gateway-service 10` will limit it to the last 10 logs
 
-gcpenv () { 
-    gcloud config set project $1; 
-    gcloud container clusters get-credentials leo-frontend --zone europe-west1-c; 
-    kubectl config use-context gke_$1_europe-west1-c_leo-frontend;
+
+### GCP: Setup Google Cloud K8s cluster
+# gcloud config set project $1; 
+# gcloud container clusters get-credentials leo-frontend --zone europe-west1-c; 
+
+### Azure: Login to Azure and set cluster 
+
+kube-pod-name() {
+    local svc=$1
+    local namespace=$2
+    local podline=($(kubectl get pods -n ${namespace} | grep ${svc}))
+    echo "${podline[1]}"
 }
-#there is also kubectx and kubens that are installable with homebrew: https://github.com/ahmetb/kubectx
-gcpproxy () { 
-    local a=$1; local b=$2; local c=$3; 
-    eval $(kubectl -n $a get pods | grep $b | awk 'NR==1{printf "kubectl -n $a port-forward %s %s\n", $1, "$c:$c" }');
+
+kube-get-namespace() {
+    local ns=${1-$KUBE_NAMESPACE}
+    if [ -z $ns ]; then
+        echo "# MISSING NAMESPACE!"
+        echo "=> Set with helper"
+        echo "$ kube-ns mynamespace"
+    fi
+    echo $ns
 }
-gcplags () { 
-    gcpproxy $1 leo-api-gateway-service- 5011;
+
+kube-az() {
+    local registry=$1
+    if [ -z $registry ]; then
+        echo "# MISSING REGISTRY!"
+        echo "=> Please define which azure registry to login to!"
+        echo "$ kube-az myregistry"
+        return
+    fi
+    az login
+    echo "# Successfully logged in to Azure"
+    echo "-> Connecting to ${registry}"
+    az acr login -n $registry
 }
-gcpcouch () { 
-    gcpproxy $1 couchbase 8091;
+
+kube-ns() {
+    echo "# Global k8s namespace set to: ${1}"
+    export KUBE_NAMESPACE=$1
 }
-gcpcouch2 () { 
-    gcpproxy $1 couchbase 11210;
+
+kube-context () { 
+    context=$1
+    kubectl config use-context $context;
 }
-gcpcouch-all () {
-    gcpcouch $1 & gcpcouch2 $1
+
+kube-logs() {
+    local svc=$1
+    local namespace=$(kube-get-namespace $2)
+
+    if [ -z $svc ] || [ -z $namespace ]; then
+        echo "# Missing required params!"
+        echo "$ kube-logs myservice mynamespace"
+    else
+        kubectl logs -f --namespace ${namespace} $(kube-pod-name ${svc} ${namespace})
+    fi
 }
-gcplogs () { 
-    local a=$1; local b=$2; local c=${3:=200}; 
-    eval $(kubectl -n $a get pods | grep $b | awk 'NR==1{printf "kubectl -n $a logs %s -c $b --tail=$c\n", $1 }');
-}
-gcppods () {
-    local a=$1;
-    if [ ! -z $a ]; then
-        kubectl -n $a get pods;
+
+kube-pods () {
+    local namespace=${1-$KUBE_NAMESPACE}
+    if [ ! -z $namespace ]; then
+        kubectl -n $namespace get pods;
     else 
         kubectl get pods --all-namespaces;
     fi
+}
+kube-svc() {
+    local namespace=${1-$KUBE_NAMESPACE}
+    if [ ! -z $namespace ]; then
+        kubectl get svc -n $namespace
+    else 
+        kubectl get svc
+    fi
+}
+kube-proxy() {
+    local svc=$1
+    local port=${2:-8080}
+    local innerport=${3-8080}
+    local namespace=${4-$KUBE_NAMESPACE}
+    kubectl port-forward -n $namespace svc/$svc $port:$innerport
 }

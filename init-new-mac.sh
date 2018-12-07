@@ -55,6 +55,8 @@ BREW=(
   azure-cli
   python3
   mosquitto
+  gnupg
+  git-crypt
 )
 
 CASK=(

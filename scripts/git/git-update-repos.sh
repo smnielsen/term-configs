@@ -128,7 +128,7 @@ runUpdate() {
     fi
 
     # Reset stash if any
-    if [[ $WAS_STASHED != "No local changes to save" ]]; then
+    if [[ $WAS_STASHED != "No local changes to save" ]] && [ -z ${SHOULD_RESET} ]; then
         echo "$ Applying previous stash"
         git stash pop
     fi

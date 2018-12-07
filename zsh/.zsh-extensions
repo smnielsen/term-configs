@@ -55,6 +55,11 @@ alias couchbase-start='docker start db'
 alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
 
 ########################################
+## JWT helper
+########################################
+alias jwtupdate="node $SMN_CONFIG_DIR/scripts/auth/jwt.js"
+
+########################################
 ## Global functions for terminal
 ########################################
 lookup-port() {
@@ -72,6 +77,16 @@ dsh() {
   else
     docker exec -it "$1" /bin/sh
   fi
+}
+
+# shortcut to docker logs
+# User $ dl <container name> from the shell
+dl() {
+  local name=$1
+  cids=($(docker ps -aqf "name=$1"))
+  cid=${cids[1]}
+  echo "# Container logs for: ${cid}"
+  docker logs -f ${cid}
 }
 
 # Fun times

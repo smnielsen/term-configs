@@ -1,38 +1,33 @@
 ##########
-## Google Cloud shortcuts
+## Kubernetes Commands
 ##########
-# "gcpenv" will let you switch between the different GCP setups, `gcpenv leo-stage-italy`
-# "gcplags" will setup a local port-forward for the chosen environment, `gcplags portal-dev52` will allow you to use `http://localhost:5011` in your `.env` files as a LAGS url
-# "gcpcouch" works the same way as gcplags but for couchbase port 8091
-# "gcpcouch2" works the same way as gcplags but for couchbase port 11210
-# "gcpcouch-all" starts both 1 and 2 of gcpcouch
-# "gcpproxy" is a generic function that lets you do `gcpproxy <env> <service> <port>` (e.g `gcpproxy portal-dev52 couchbase 8091`)
-# "gcplogs" will fetch logs for your service. `gcplogs portal-devXX leo-api-gateway-service` will fetch the last 200 logs, you can specify the number of logs with the optional third parameter `gcplogs portal-devXX leo-api-gateway-service 10` will limit it to the last 10 logs
+kube-help() {
+    echo '
+    ### Login (Requires preset config for individual cloud)
+# Azure:        "kube-az {registry}" will log you in to Azure and switch to registry.
+# Google Cloud: "kube-gcp {project} {cluster} [zone:europe-west1-c]" will set current project and switch to cluster.
 
+    ### Commands
+# "kube-ns"     will let you set the current namespace. `kube-ns {namespace}`
+# "kube-ctx"    will let you switch between the different context setups, `kube-ctx {context}`
+# "kube-logs"   will print and follow logs for service in current namespace. `kube-logs {service}`
+# "kube-pods"   will print pods in current namespace, or all if current ns is not set. `kube-pods [namespace]`
+# "kube-svc"    will print services in current namespace, or all if current ns is not set. `kube-svc [namespace]`
+# "kube-proxy"  starts a port-forwarding of service. `kube-proxy {service} [outport:7000] [inport:8080]`    
+    '
+}
 
 ### GCP: Setup Google Cloud K8s cluster
-# gcloud config set project $1; 
-# gcloud container clusters get-credentials leo-frontend --zone europe-west1-c; 
-
-### Azure: Login to Azure and set cluster 
-
-kube-pod-name() {
-    local svc=$1
-    local namespace=$2
-    local podline=($(kubectl get pods -n ${namespace} | grep ${svc}))
-    echo "${podline[1]}"
+kube-gcp() {
+    local project=$1
+    local cluster=$2
+    local zone=${3:-europe-west1-c}
+    gcloud config set project ${project}; 
+    gcloud container clusters get-credentials ${cluster} --zone ${zone}; 
 }
 
-kube-get-namespace() {
-    local ns=${1-$KUBE_NAMESPACE}
-    if [ -z $ns ]; then
-        echo "# MISSING NAMESPACE!"
-        echo "=> Set with helper"
-        echo "$ kube-ns mynamespace"
-    fi
-    echo $ns
-}
 
+### Azure: Login to Azure and set cluster
 kube-az() {
     local registry=$1
     if [ -z $registry ]; then
@@ -52,20 +47,20 @@ kube-ns() {
     export KUBE_NAMESPACE=$1
 }
 
-kube-context () { 
+kube-ctx () { 
     context=$1
     kubectl config use-context $context;
 }
 
 kube-logs() {
     local svc=$1
-    local namespace=$(kube-get-namespace $2)
+    local namespace=$(__kube-get-namespace $2)
 
     if [ -z $svc ] || [ -z $namespace ]; then
         echo "# Missing required params!"
         echo "$ kube-logs myservice mynamespace"
     else
-        kubectl logs -f --namespace ${namespace} $(kube-pod-name ${svc} ${namespace})
+        kubectl logs -f --namespace ${namespace} $(__kube-pod-name ${svc} ${namespace})
     fi
 }
 
@@ -87,8 +82,29 @@ kube-svc() {
 }
 kube-proxy() {
     local svc=$1
-    local port=${2:-8080}
+    local port=${2:-7000}
     local innerport=${3-8080}
     local namespace=${4-$KUBE_NAMESPACE}
     kubectl port-forward -n $namespace svc/$svc $port:$innerport
+}
+
+####################
+## HELPERS
+####################
+
+__kube-pod-name() {
+    local svc=$1
+    local namespace=$2
+    local podline=($(kubectl get pods -n ${namespace} | grep ${svc}))
+    echo "${podline[1]}"
+}
+
+__kube-get-namespace() {
+    local ns=${1-$KUBE_NAMESPACE}
+    if [ -z $ns ]; then
+        echo "# MISSING NAMESPACE!"
+        echo "=> Set with helper"
+        echo "$ kube-ns mynamespace"
+    fi
+    echo $ns
 }

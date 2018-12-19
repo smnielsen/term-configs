@@ -54,11 +54,12 @@ kube-ctx () {
 
 kube-logs() {
     local svc=$1
-    local namespace=$(__kube-get-namespace $2)
+    local namespace=${1-$KUBE_NAMESPACE}
 
     if [ -z $svc ] || [ -z $namespace ]; then
         echo "# Missing required params!"
-        echo "$ kube-logs myservice mynamespace"
+        echo "# TIP: Set namespace: $ kube-ns {namespace}"
+        echo "$ kube-logs {svc} [namespace]"
     else
         kubectl logs -f --namespace ${namespace} $(__kube-pod-name ${svc} ${namespace})
     fi
@@ -72,6 +73,20 @@ kube-pods () {
         kubectl get pods --all-namespaces
     fi
 }
+
+kube-describe() {
+    local svc=$1
+    local namespace=${2-$KUBE_NAMESPACE}
+
+    if [ -z $svc ] || [ -z $namespace ]; then
+        echo "# Missing required params!"
+        echo "# TIP: Set namespace: $ kube-ns {namespace}"
+        echo "$ kube-describe {pod} [namespace]"
+    else
+        kubectl describe pods -n ${namespace} $(__kube-pod-name ${svc} ${namespace})
+    fi
+}
+
 kube-svc() {
     local namespace=${1-$KUBE_NAMESPACE}
     if [ ! -z $namespace ]; then
@@ -97,14 +112,4 @@ __kube-pod-name() {
     local namespace=$2
     local podline=($(kubectl get pods -n ${namespace} | grep ${svc}))
     echo "${podline[1]}"
-}
-
-__kube-get-namespace() {
-    local ns=${1-$KUBE_NAMESPACE}
-    if [ -z $ns ]; then
-        echo "# MISSING NAMESPACE!"
-        echo "=> Set with helper"
-        echo "$ kube-ns mynamespace"
-    fi
-    echo $ns
 }

@@ -39,8 +39,8 @@ echoAll() {
 installProgram() {
   local command=$1
   local program=$2
-  if [ -z $(command -v $program) ]; then
-    brew $2 $program >> /dev/null
+  if [ -z "$(command -v $program)" ]; then
+    brew $command $program >> /dev/null
   else
     log "=> $program already installed"
   fi
@@ -156,7 +156,7 @@ cd ## Start in HOME dir
 
 step "Configure oh-my-zsh"
 if [ -z $(command -v ascii-dunno) ]; then
-  echo "## Custom config from: https://github.com/smnielsen/config" >> .zshrc
+  echo "## Custom config from: https://github.com/smnielsen/config" > .zshrc
   echo "export SMN_CONFIG_DIR=${DIRNAME}" >> .zshrc
   echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
   success "oh-my-zsh configured = .zshrc"

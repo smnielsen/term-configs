@@ -182,8 +182,8 @@ cd ## Start in HOME dir
 step "Configure oh-my-zsh"
 if [ -z $(command -v ascii-dunno) ]; then
   echo "## Custom config from: https://github.com/smnielsen/config" > .zshrc
-  echo "export SMN_CONFIG_DIR=${DIRNAME}" >> .zshrc
-  echo "source ${DIRNAME}/zsh/.zshrc" >> .zshrc
+  echo "export SMN_CONFIG_DIR=${HOME}/${DIRNAME}" >> .zshrc
+  echo "source ${HOME}/${DIRNAME}/zsh/.zshrc" >> .zshrc
   success "oh-my-zsh configured = .zshrc"
 else
   success "ZSH already configured"

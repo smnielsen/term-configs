@@ -20,6 +20,9 @@ success() {
 }
 
 echoAll() {
+  echo "### Required Apps"
+  echo ">> ${ZSH_REQ[@]}"
+  echo ""
   echo "### Homebrew"
   echo ">> ${BREW[@]}"
   echo ""
@@ -33,21 +36,34 @@ echoAll() {
   echo ">> ${YARN_GLOBAL[@]}"
 }
 
-BREW=(
+installProgram() {
+  local command=$1
+  local program=$2
+  if [ -z $(command -v $program) ]; then
+    brew $2 $program >> /dev/null
+  else
+    log "=> $program already installed"
+  fi
+}
+
+ZSH_REQ=(
   zsh
   zsh-syntax-highlighting
   zsh-autosuggestions
   zsh-git-prompt
   nvm
-  yarn
   git
+)
+
+BREW=(
+  mas # Mac App Store installation CLI
+  yarn
   watchman
   kubectx # Kubernetes https://github.com/ahmetb/kubectx
   rabbitmq
   mongodb
   mysql
   maven
-  mas # Mac App Store installation CLI
   jpeg
   imagemagick
   pngquant
@@ -179,9 +195,33 @@ else
 fi
 
 ###############################
+# Install zgen and required apps
+step "Installing zgen"
+if [ ! -d "${HOME}/.zgen" ]; then
+  git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
+  success "Installed zgen"
+else
+  success "Already installed zgen"
+fi
+
+step "Install required apps"
+for program in "${ZSH_REQ[@]}"; do
+  log "Installing $program..."
+  installProgram install $program
+done
+success "Required apps installed"
+echo ""
+
+###############################
 # Setup dev dirs
 mkdir -p ${HOME}/dev
 mkdir -p ${HOME}/dev/private
+
+###############################
+# Install Xcode deps & Git
+step "Install Xcode deps and Git"
+xcode-select --install
+success "Xcode setup"
 
 ###############################
 ## INSTALL ALL APPLICATIONS
@@ -197,50 +237,49 @@ while true; do
   esac
 done
 
-
-step "=== Homebrew - Terminal Apps ==="
+step "Install Terminal Apps"
 for program in "${BREW[@]}"; do
   log "Installing $program..."
-  brew install $program >> /dev/null
+  installProgram install $program
 done
 success "Terminal apps installed"
 echo ""
 
-step "Installing zgen"
-git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
-success "Installed zgen"
-
-step "=== Homebrew Cask - Programs ==="
+step "Install Cask Programs"
 for program in "${CASK[@]}"; do
   log "Installing $program..."
-  brew cask $program >> /dev/null
+  installProgram cask $program
 done
-success "Cask applications installed"
+success "Cask Programs installed"
 echo ""
 
-step "=== Mac App Store - Applications ==="
+step "Mac App Store - Applications"
 for program in "${MAS[@]}"; do
   split=(${program//:/ })
   name=${split[0]}
   id=${split[1]}
 
-  log "max install $name: $id"
-  mas install $id >> /dev/null
+  if [ -z "$(mas list | grep $id)" ]; then
+    log "mas install $name: $id"
+    mas install $id >> /dev/null
+  else
+    log "=> $name:$id Already installed"
+  fi
 done
 success "Mac App Store applications installed"
 echo ""
 
-step "=== Yarn - Global Apps ==="
+step "Yarn - Install Global Apps"
 for program in "${YARN_GLOBAL[@]}"; do
   log "Yarn install $program..."
-  yarn global add $program
+  if [ -z "$(command -v $program)" ]; then
+    yarn global add $program
+  else
+    log "=> $program already installed"
+  fi
 done
 success "Yarn/Npm apps installed"
 echo ""
-
-###############################
-# Load .zshrc
-source ${HOME}/.zshrc
 
 ###############################
 step ">>>> Finilized setting up Mac <<<<"

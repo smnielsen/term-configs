@@ -2,14 +2,14 @@
 start=$(date +%s)
 log() {
   local t=$1
-  printf "  \033[37;1m$t\033[0m\n"
+  printf "  \033[97;m$t\033[0m\n"
 }
 
 STEP_COUNT=0
 step() {
   local t=$1
   ((STEP_COUNT++))
-  printf "# \033[34;1mStep ${STEP_COUNT}: $t\033[0m\n"
+  printf "#\033[34;1m Step ${STEP_COUNT}: $t\033[0m\n"
   start=$(date +%s)
 }
 
@@ -36,13 +36,36 @@ echoAll() {
   echo ">> ${YARN_GLOBAL[@]}"
 }
 
+finishUp() {
+  log ""
+  success "Initialization Completed! :)"
+  log "===== MANUAL STEPS ========"
+  log ""
+  step "Add custom colors to terminal"
+  log "1. iterm2 -> Preferences"
+  log "  -> Profiles -> Colors -> Color Presets... -> Import"
+  log "2. Choose iterm/netlight-colors.itermcolors"
+  log "3. Color presets... -> netlight-colors"
+  log ""
+  step "Enable always open previous dir for new tabs"
+  log "1. iterm2 -> Preferences -> Profiles"
+  log "   -> General -> Working directory -> Reuse previous"
+  log ""
+  step "Restart Terminal"
+  log "You should probably restart your terminal now..."
+  echo ""
+
+  cd ${PREV_DIR}
+  log "Finished init-new-mac!";
+}
+
 installProgram() {
   local command=$1
   local program=$2
-  if [ -z "$(command -v $program)" ]; then
-    brew $command $program >> /dev/null
-  else
+  if brew ls --versions $program > /dev/null; then
     log "=> $program already installed"
+  else
+    brew $command $program >> /dev/null
   fi
 }
 
@@ -128,8 +151,10 @@ MANUAL=(
 
 step "Installation of a new Mac OS X Computer"
 log "Setup is done with no promise of success"
-log "Continuing is done on your own risk. :)"
-log "¯\_(ツ)_/¯"
+log "* This will reset applications"
+log "* This will remove already set configs"
+log "Continuing is done on your own risk."
+log "    ¯\_(ツ)_/¯      "
 while true; do
   read -p "Do you wish to continue (y/n)? " yn
   case $yn in
@@ -232,7 +257,7 @@ while true; do
   read -p "Do you wish to continue (y/n)? " yn
   case $yn in
     [Yy]* ) echo "Continuing with installation..."; break;;
-    [Nn]* ) echo "Exiting installation!"; exit;;
+    [Nn]* ) finishUp; exit;;
     * ) echo "Please answer yes or no.";;
   esac
 done
@@ -297,16 +322,6 @@ for program in "${MANUAL[@]}"; do
   echo ""
 done
 echo ""
-log "-- Add Custom Colors to terminal"
-log "   > iterm2 -> Preferences -> Profiles -> Colors -> Color Presets... -> Import"
-log "   > Choose iterm/netlight-colors.itermcolors"
-log "   > Color presets... -> netlight-colors"
-log "-- Set to always open previous dir"
-log "   > iterm2 -> Preferences -> Profiles -> General -> Working directory -> Reuse previous ..."
-echo "--------------------"
-success "FYI: You should probly restart your terminal now..."
-ascii-dunno
-echo ""
+finishUp
 
-cd ${PREV_DIR}
 exit 0

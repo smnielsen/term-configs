@@ -126,13 +126,7 @@ runUpdate() {
         printBold "$ Running npm install"
         npm install
     fi
-
-    # Reset stash if any
-    if [[ $WAS_STASHED != "No local changes to save" ]] && [ -z ${SHOULD_RESET} ]; then
-        echo "$ Applying previous stash"
-        git stash pop
-    fi
-
+   
     # Successful
     endin=$(date +%s)
     local time="$((($endin-$startin) / 60))m $((($endin-$startin) % 60))s"

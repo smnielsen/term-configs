@@ -43,13 +43,21 @@ kube-az() {
 }
 
 kube-ns() {
-    echo "# Global k8s namespace set to: ${1}"
-    export KUBE_NAMESPACE=$1
+    if [ -z $1 ]; then
+        echo "# K8S Current namespace: ${KUBE_NAMESPACE:-not set}"
+    else
+        echo "# Global K8S namespace set to: ${1}"
+        export KUBE_NAMESPACE=$1
+    fi
 }
 
 kube-ctx () { 
-    context=$1
-    kubectl config use-context $context;
+    local context=$1
+    if [ -z $context ]; then
+        kubectx
+    else
+        kubectl config use-context $context;
+    fi
 }
 
 kube-logs() {

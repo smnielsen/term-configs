@@ -83,6 +83,7 @@ BREW=(
   yarn
   watchman
   kubectx # Kubernetes https://github.com/ahmetb/kubectx
+  fzf
   rabbitmq
   mongodb
   mysql

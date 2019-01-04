@@ -70,8 +70,13 @@ loaded "env-vars"
 loading "nvm"
 export NVM_DIR="$HOME/.nvm"
 source /usr/local/opt/nvm/nvm.sh
-
 loaded "nvm"
+
+#### Load Fuzzy Finder
+loading "Fuzzy Finder"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+loaded "Fuzzy Finder"
+
 ## Google Cloud
 loading "google-cloud"
 # The next line updates PATH for the Google Cloud SDK.

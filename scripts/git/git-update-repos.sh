@@ -110,6 +110,7 @@ runUpdate() {
         printBold "$ Removing node_modules && package-lock.json"
         rm -rf node_modules
         rm -rf package-lock.json
+        npm i --package-lock-only
     fi
     
     if [ -z ${IGNORE_NODE_MODULES} ]; then

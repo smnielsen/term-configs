@@ -54,6 +54,7 @@ kube-ns() {
 kube-ctx () { 
     local context=$1
     if [ -z $context ]; then
+        echo "# K8S Current Cluster: $(kubectl config current-context)"
         kubectx
     else
         kubectl config use-context $context;
@@ -62,12 +63,15 @@ kube-ctx () {
 
 kube-logs() {
     local svc=$1
-    local namespace=${1-$KUBE_NAMESPACE}
+    local namespace=${2-$KUBE_NAMESPACE}
 
     if [ -z $svc ] || [ -z $namespace ]; then
         echo "# Missing required params!"
         echo "# TIP: Set namespace: $ kube-ns {namespace}"
         echo "$ kube-logs {svc} [namespace]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
     else
         kubectl logs -f --namespace ${namespace} $(__kube-pod-name ${svc} ${namespace})
     fi
@@ -90,6 +94,9 @@ kube-describe() {
         echo "# Missing required params!"
         echo "# TIP: Set namespace: $ kube-ns {namespace}"
         echo "$ kube-describe {pod} [namespace]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
     else
         kubectl describe pods -n ${namespace} $(__kube-pod-name ${svc} ${namespace})
     fi
@@ -108,7 +115,15 @@ kube-proxy() {
     local port=${2:-7000}
     local innerport=${3-8080}
     local namespace=${4-$KUBE_NAMESPACE}
-    kubectl port-forward -n $namespace svc/$svc $port:$innerport
+    if [ -z $namespace ]; then
+        echo "# Namespace is not set."
+        echo "$ kube-ns [NAMESPACE]"
+        echo ""
+        echo "= Available namespaces ="
+        kubectl get namespaces
+    else
+        kubectl port-forward -n $namespace svc/$svc $port:$innerport
+    fi
 }
 
 ####################

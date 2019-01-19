@@ -57,7 +57,8 @@ alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
 ########################################
 ## JWT helper
 ########################################
-alias jwtupdate="node $SMN_CONFIG_DIR/scripts/auth/jwt.js"
+alias jwtupdate="node $SMN_CONFIG_DIR/scripts/auth/jwt-enrich.js"
+alias jwtverify="node $SMN_CONFIG_DIR/scripts/auth/jwt-verify.js"
 
 ########################################
 ## Global functions for terminal

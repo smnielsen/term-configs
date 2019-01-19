@@ -152,8 +152,9 @@ MANUAL=(
 
 step "Installation of a new Mac OS X Computer"
 log "Setup is done with no promise of success"
-log "* This will reset applications"
-log "* This will remove already set configs"
+log "* Will reset applications"
+log "* Will remove already set configs"
+log "Make sure to follow progress when configuring system initially..."
 log "Continuing is done on your own risk."
 log "    ¯\_(ツ)_/¯      "
 while true; do
@@ -193,10 +194,20 @@ fi
 ###############################
 ## SETUP GIT CONFIG
 step "Git Configuration"
-git config --global user.name "Simon Nielsen"
-git config --global user.email "simonmtnielsen@gmail.com"
+read -p "Git Name (Empty=\"Simon Nielsen\"): " gn
+read -p "Git Email (Empty=\"simonnielsen@live.se\"): " ge
+GITHUB_NAME=${gn:-"Simon Nielsen"}
+GITHUB_EMAIL=${ge:-"simonnielsen@live.se"}
+git config --global user.name ${GITHUB_NAME}
+git config --global user.email ${GITHUB_EMAIL}
 git config --global core.ignorecase false
 success "Configured GIT"
+
+###############################
+# Install Xcode deps & Git
+step "Install Xcode deps and Git"
+xcode-select --install
+success "Xcode setup"
 
 ###############################
 # SSH Creation and add
@@ -242,12 +253,6 @@ echo ""
 # Setup dev dirs
 mkdir -p ${HOME}/dev
 mkdir -p ${HOME}/dev/private
-
-###############################
-# Install Xcode deps & Git
-step "Install Xcode deps and Git"
-xcode-select --install
-success "Xcode setup"
 
 ###############################
 ## INSTALL ALL APPLICATIONS

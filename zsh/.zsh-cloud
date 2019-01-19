@@ -8,12 +8,16 @@ kube-help() {
 # Google Cloud: "kube-gcp {project} {cluster} [zone:europe-west1-c]" will set current project and switch to cluster.
 
     ### Commands
-# "kube-ns"     will let you set the current namespace. `kube-ns {namespace}`
-# "kube-ctx"    will let you switch between the different context setups, `kube-ctx {context}`
-# "kube-logs"   will print and follow logs for service in current namespace. `kube-logs {service}`
-# "kube-pods"   will print pods in current namespace, or all if current ns is not set. `kube-pods [namespace]`
-# "kube-svc"    will print services in current namespace, or all if current ns is not set. `kube-svc [namespace]`
-# "kube-proxy"  starts a port-forwarding of service. `kube-proxy {service} [outport:7000] [inport:8080]`    
+# "kube-ns"         will let you set the current namespace. `kube-ns {namespace}`
+# "kube-ctx"        will let you switch between the different context setups, `kube-ctx {context}`
+# "kube-logs"       will print and follow logs for service in current namespace. `kube-logs {service}`
+# "kube-pods"       will print pods in current namespace, or all if current ns is not set. `kube-pods [namespace]`
+# "kube-describe"   Will print information about POD. `kube-describe [POD]`
+# "kube-svc"        will print services in current namespace, or all if current ns is not set. `kube-svc [namespace]`
+# "kube-proxy"      starts a port-forwarding of service. `kube-proxy {service} [outport:7000] [inport:8080]`
+
+    ### Osram
+# "kube-proxy-kc"   starts a port-forwarding of keycloak. `kube-proxy-kc [short-env]`. eg. `kube-proxy-kc dev`    
     '
 }
 
@@ -124,6 +128,17 @@ kube-proxy() {
     else
         kubectl port-forward -n $namespace svc/$svc $port:$innerport
     fi
+}
+
+####################
+## OSRAM Specifics
+####################
+## Will start a proxy to keycloak on env
+kube-proxy-kc() {
+  local env=$1
+  kube-ns osramid
+  kube-ctx olt-$env
+  kube-proxy id-keycloak-http 7000 80
 }
 
 ####################

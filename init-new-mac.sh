@@ -111,6 +111,7 @@ CASK=(
   google-chrome
   firefox
   slack
+  pencil
   1password
   evernote
   dropbox

@@ -34,26 +34,26 @@ IGNORE_NODE_MODULES=
 
 while [[ $# -gt 0 ]]; do
     key="$1"
-
+    
     case $key in
         -r|--reset)
-        SHOULD_RESET="true"
-        printBold "ARG: Activating Reset to master for all branches"
-        shift # past argument
+            SHOULD_RESET="true"
+            printBold "ARG: Activating Reset to master for all branches"
+            shift # past argument
         ;;
         -im|--ignore-modules)
-        IGNORE_NODE_MODULES="true"
-        printBold "ARG: Ignore node modules"
-        shift # past argument
+            IGNORE_NODE_MODULES="true"
+            printBold "ARG: Ignore node modules"
+            shift # past argument
         ;;
         -x|--prefix)
-        UPDATE_PREFIX=$2
-        shift # past argument
-        shift # past value
+            UPDATE_PREFIX=$2
+            shift # past argument
+            shift # past value
         ;;
         *)    # unknown option
-        printYellow "Unknown option: $key"
-        shift # past argument
+            printYellow "Unknown option: $key"
+            shift # past argument
         ;;
     esac
 done
@@ -69,11 +69,19 @@ runUpdate() {
     startin=$(date +%s)
     local repoName=$1
     cd $repoName
+    # First check if Git
+    if [ ! -d '.git' ]; then 
+        echo "${repoName} is not a Git repository"
+        SKIPPED+=("$repoName->Not a Git repository")
+        goBack
+        return 0
+    fi
+
+    # Check git
     branchName=$(git rev-parse --abbrev-ref HEAD)
     printBlueBold " -- $repoName ($branchName) --"
-
-    # Only update master and develop branches
     
+    # Only update master and develop branches    
     if [[ $branchName != "master" ]] && [[ $branchName != *develop ]]; then
         if [ -z $SHOULD_RESET ]; then
             echo "SKIP: Not on master or develop"
@@ -86,7 +94,7 @@ runUpdate() {
         git fetch
         git checkout master
     fi
-
+    
     if [ -z ${SHOULD_RESET} ]; then
         # Stash anything
         printBold "$ Stashing '${branchName}' changes"
@@ -96,7 +104,7 @@ runUpdate() {
         printBold "$ Resetting '${branchName}' HEAD"
         git checkout HEAD .
     fi
-
+    
     # Run the update
     if ! git pull --rebase; then
         local msg=$?
@@ -105,15 +113,14 @@ runUpdate() {
         goBack
         return 0
     fi
-
-    if [ ! -z ${SHOULD_RESET} ]; then
-        printBold "$ Removing node_modules && package-lock.json"
-        rm -rf node_modules
-        rm -rf package-lock.json
-        npm i --package-lock-only
-    fi
     
     if [ -z ${IGNORE_NODE_MODULES} ]; then
+        if [ ! -z ${SHOULD_RESET} ]; then
+            printBold "$ Removing node_modules && package-lock.json"
+            rm -rf node_modules
+            rm -rf package-lock.json
+            npm i --package-lock-only
+        fi
         # Change node and npm versions
         if [ -f ".nvmrc" ]; then
             printBold "$ Node version: from .nvmrc"
@@ -122,18 +129,18 @@ runUpdate() {
             printBold "$ Node version: 10.*"
             nvm install 10
         fi
-
+        
         # Install node_modules
         printBold "$ Running npm install"
         npm install
     fi
-   
+    
     # Successful
     endin=$(date +%s)
     local time="$((($endin-$startin) / 60))m $((($endin-$startin) % 60))s"
     UPDATED+=("$time: $repoName")
     printGreen "Update successful!"
-
+    
     goBack
     return 0
 }

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+
+bytesToHuman() { 
+  awk -v sum="$1" ' BEGIN {hum[1024^3]="Gb"; hum[1024^2]="Mb"; hum[1024]="Kb"; for (x=1024^3; x>=1024; x/=1024) { if (sum>=x) { printf "%.2f %s\n",sum/x,hum[x]; break; } } if (sum<1024) print "1kb"; } '}
+
+curlSize() {
+  echo "URI: ${1}"
+
+  SIZE=$(curl -so /dev/null "${1}" -w '%{size_download}')
+  SIZE_HUMAN=$(bytesToHuman "$SIZE")
+  echo "Uncompressed size : $SIZE_HUMAN"
+
+  SIZE=$(curl --compressed -so /dev/null "${1}" -w '%{size_download}')
+  SIZE_HUMAN=$(bytesToHuman "$SIZE")
+  echo "Compressed size   : $SIZE_HUMAN"
+}

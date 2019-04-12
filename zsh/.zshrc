@@ -109,8 +109,11 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-extensions
 # Load Cloud Shortcuts
 source ${SMN_CONFIG_DIR}/zsh/.zsh-cloud
 
-# Load Cloud Shortcuts
+# Load zsh git shortcuts
 source ${SMN_CONFIG_DIR}/zsh/.zsh-git
+
+# Load Cloud bytes algorithms
+source ${SMN_CONFIG_DIR}/zsh/.zsh-bytes
 
 loaded "zsh-sources"
 # Load Zgen

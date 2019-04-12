@@ -13,15 +13,15 @@ alias npm-clean='rm -rf node_modules; rm -f package-lock.json'
 alias npm-reset='npm-clean; nvm i; npm i'
 
 npm-install-global() {
-  local package=$1 # @scope/concurrently
-  local program=$(echo $package | awk -F/ '{print $NF}')
-  if [ ! -z $splitlast ] && [ $(where ${program}) != "${program} not found"]; then
-    # npm install -g concurrently
-    echo "$ Installing ${package} Globally"
-    npm install -g $package
-  else
-    echo "$ ${package} already installed"
-  fi
+    local package=$1 # @scope/concurrently
+    local program=$(echo $package | awk -F/ '{print $NF}')
+    if [ ! -z $splitlast ] && [ $(where ${program}) != "${program} not found"]; then
+        # npm install -g concurrently
+        echo "$ Installing ${package} Globally"
+        npm install -g $package
+    else
+        echo "$ ${package} already installed"
+    fi
 }
 
 ########################################
@@ -32,6 +32,12 @@ npm-install-global() {
 # $3 => <pod-hash> =>
 alias k8s-logs="kubectl logs -n portal-$1 $2-$3 -f"
 alias k8s-config="kubectl describe -n portal-$1 configmap $2-config"
+
+########################################
+## docker-compose helpers
+########################################
+alias dcl="docker-compose logs $1"
+alias dclf="docker-compose logs -f $1"
 
 ########################################
 ## Java + Gradlew
@@ -59,13 +65,14 @@ alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
 ########################################
 alias jwtupdate="node $SMN_CONFIG_DIR/scripts/auth/jwt-enrich.js"
 alias jwtverify="node $SMN_CONFIG_DIR/scripts/auth/jwt-verify.js"
+alias jwtrefresh="node $SMN_CONFIG_DIR/scripts/auth/jwt-refresh.js"
 
 ########################################
 ## Global functions for terminal
 ########################################
 lookup-port() {
-  local port=$1
-  sudo lsof -n -i:$port | grep LISTEN
+    local port=$1
+    sudo lsof -n -i:$port | grep LISTEN
 }
 # Shortcut to docker exec
 # Use dsh <container name> from the shell
@@ -73,21 +80,21 @@ lookup-port() {
 # run inside the container, if you do not
 # the default command is /bin/sh.
 dsh() {
-  if [ ! -z "$2" ]; then
-    docker exec -it "$1" "${@:2}"
-  else
-    docker exec -it "$1" /bin/sh
-  fi
+    if [ ! -z "$2" ]; then
+        docker exec -it "$1" "${@:2}"
+    else
+        docker exec -it "$1" /bin/sh
+    fi
 }
 
 # shortcut to docker logs
 # User $ dl <container name> from the shell
 dl() {
-  local name=$1
-  cids=($(docker ps -aqf "name=$1"))
-  cid=${cids[1]}
-  echo "# Container logs for: ${cid}"
-  docker logs -f ${cid}
+    local name=$1
+    cids=($(docker ps -aqf "name=$1"))
+    cid=${cids[1]}
+    echo "# Container logs for: ${cid}"
+    docker logs -f ${cid}
 }
 
 # Fun times

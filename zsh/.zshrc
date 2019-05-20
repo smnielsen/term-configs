@@ -115,6 +115,9 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-git
 # Load Cloud bytes algorithms
 source ${SMN_CONFIG_DIR}/zsh/.zsh-bytes
 
+# Load OLT stuff
+source ${SMN_CONFIG_DIR}/zsh/clients/.zsh-olt
+
 loaded "zsh-sources"
 # Load Zgen
 loading "zgen"

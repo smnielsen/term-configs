@@ -86,14 +86,12 @@ BREW=(
   fzf
   rabbitmq
   mongodb
-  mysql
   maven
   jpeg
   imagemagick
   pngquant
   TomAnthony/brews/itermocil
   couchdb
-  mongodb
   mongoose
   go
   glide
@@ -104,6 +102,7 @@ BREW=(
   mosquitto
   gnupg
   git-crypt
+  hugo # Technical Documentation https://gohugo.io/getting-started/installing/
 )
 
 CASK=(

@@ -36,8 +36,9 @@ alias k8s-config="kubectl describe -n portal-$1 configmap $2-config"
 ########################################
 ## docker-compose helpers
 ########################################
-alias dcl="docker-compose logs $1"
-alias dclf="docker-compose logs -f $1"
+alias dco="docker-compose"
+alias dcol="docker-compose logs $1"
+alias dcolf="docker-compose logs -f $1"
 
 ########################################
 ## Java + Gradlew
@@ -63,9 +64,11 @@ alias git-update=". $SMN_CONFIG_DIR/scripts/git/git-update-repos.sh"
 ########################################
 ## JWT helper
 ########################################
-alias jwtupdate="node $SMN_CONFIG_DIR/scripts/auth/jwt-enrich.js"
-alias jwtverify="node $SMN_CONFIG_DIR/scripts/auth/jwt-verify.js"
-alias jwtrefresh="node $SMN_CONFIG_DIR/scripts/auth/jwt-refresh.js"
+alias jwt-perms="node $SMN_CONFIG_DIR/scripts/auth/jwt-enrich-perms.js"
+alias jwt-update="node $SMN_CONFIG_DIR/scripts/auth/jwt-enrich.js"
+alias jwt-verify="node $SMN_CONFIG_DIR/scripts/auth/jwt-verify.js"
+alias jwt-refresh="node $SMN_CONFIG_DIR/scripts/auth/jwt-refresh.js"
+alias jwt-decode="node $SMN_CONFIG_DIR/scripts/auth/jwt-decode.js"
 
 ########################################
 ## Global functions for terminal

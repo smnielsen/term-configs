@@ -17,6 +17,7 @@ Je4QtJOJF9D5dRGUQQJALAen32samHUO7iiWR8Z7e3i2esD1T+MhRdRjatrcJo9y
 ELx3OAj9CZysL+3Cfaj5J9I7BUXfaJLDa3J5BF25UA==
 -----END RSA PRIVATE KEY-----
 `;
+
 const addToJwt = (token, data = {}) => {
   const decoded = token ? jwt.decode(token) : {};
   return jwt.sign({

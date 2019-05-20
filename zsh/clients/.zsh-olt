@@ -1,0 +1,2 @@
+## Setup Aliases
+alias olt-read-errors="node $SMN_CONFIG_DIR/scripts/olt/list-create-errors.js"

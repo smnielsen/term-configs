@@ -180,8 +180,8 @@ kube-proxy-app() {
     local env=$1
     kube-ns osramid
     kube-ctx olt-$env
-    echo "# Running app-service on http://localhost:7001"
-    kube-proxy app-service 7001 8080
+    echo "# Running app-service on http://localhost:7002"
+    kube-proxy app-service 7002 8080
 }
 ####################
 ## HELPERS

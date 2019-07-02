@@ -24,8 +24,8 @@ const base = process.cwd();
 const fileList = recFindByExt(base, 'js');
 let count = 0;
 const errorRegex = /(?<=createError\()\s*`.*?(?=`)|(?<=createError\()\s*'.*?(?=')/gm;
-let output = `## Error Messages ${base}\n\n`;
-output += fileList.reduce((fullResult, fileUri, index) => {
+
+let output = fileList.reduce((fullResult, fileUri, index) => {
   const data = fs.readFileSync(fileUri, 'utf8');
   const errorMessages = data.match(errorRegex) || [];
   const flattenedList = errorMessages.map(str =>
@@ -35,9 +35,9 @@ output += fileList.reduce((fullResult, fileUri, index) => {
   if (flattenedList.length > 0) {
     strRes = `### (${index}) File: ${fileUri.replace(base, '')}\n`;
     flattenedList.forEach((errorMessage, index2) => {
-      strRes += `* [ ] _${errorMessage
+      strRes += `What? ****\n\`${errorMessage
         .replace('`', '')
-        .replace("'", '')}_\n  * Next: \n\n`;
+        .replace("'", '')}\`\n=> \n\n`;
     });
     count += flattenedList.length;
     strRes += `> ----- Found: ${flattenedList.length} messages------\n\n`;
@@ -45,8 +45,9 @@ output += fileList.reduce((fullResult, fileUri, index) => {
   return (fullResult += strRes);
 }, '');
 
+output = `## Error Messages ${base}\n**Total: ${count}**\n\n` + output;
 const outputFile = path.join(base, 'error-messages.md');
 console.log('output', output);
-console.log(`Found ${count} error messages`);
 fs.writeFileSync(outputFile, output);
+console.log(`Found ${count} error messages`);
 console.log(`Wrote to ${outputFile}`);

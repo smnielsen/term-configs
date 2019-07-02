@@ -1,0 +1,15 @@
+{
+  "name": "olt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "cleanup-devices.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@lightelligence/olt-microservice-package": "^1.6.0",
+    "uuid": "^3.3.2"
+  }
+}

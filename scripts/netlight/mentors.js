@@ -31,6 +31,7 @@ async function main() {
   const res = await fs.readFile(input);
   const data = JSON.parse(res).data;
 
+  const isInOffice = nler => nler.office.toLowerCase() === city.toLowerCase();
   // Map data to persons
   // prettier-ignore
   let netlighters = data.reduce((persons, [id, email, mentor, level, doing, link, office, fullName, phoneNumber, { "0": imageUrl }]) => {
@@ -49,7 +50,7 @@ async function main() {
       // log(`Missing mentor data for ${rest.fullName}`.yellow);
       mentorData = {
         fullName: 'unknown',
-        office: 'unknown',
+        office: '',
       };
     }
     return {
@@ -60,11 +61,47 @@ async function main() {
   // Verify data, print me
   // log(`Myself`, netlighters.find(nl => nl.fullName === 'Simon Nielsen'));
 
+  // Pretty print sorted by mentor
+  const mappedByMentor = netlighters.reduce((memo, { mentor, ...rest }) => {
+    if (isInOffice(mentor)) {
+      if (!memo[mentor.id]) {
+        memo[mentor.id] = [];
+      }
+      memo[mentor.id].push({
+        ...rest,
+        mentor,
+      });
+    }
+    return memo;
+  }, {});
+
+  Object.keys(mappedByMentor).forEach(mentorId => {
+    const mentees = mappedByMentor[mentorId];
+    const mentor = mentees[0].mentor;
+    log(
+      `${mentor.office.toLowerCase() === city.toLowerCase() ? '✅' : '⚠️'} ${
+        mentor.fullName === 'unknown' ? 'No mentor' : mentor.fullName
+      } in "${mentor.office}" (${mentees.length} mentees):`.bold,
+    );
+    mentees.sort(({ level: la }, { level: lb }) => {
+      return LEVELS[la] < LEVELS[lb] ? -1 : 1;
+    });
+    mentees.forEach(nler => {
+      const { fullName, level, office, mentor, doing } = nler;
+      log(
+        `   ${level}: ${
+          office === mentor.office ? fullName.green : fullName.yellow
+        } in "${office}" as "${doing}"`,
+      );
+    });
+  });
+
+  log('------------');
+
   // Filter city
   const cityNl = netlighters.filter(
     ({ office }) => office.toLowerCase() === city.toLowerCase(),
   );
-
   // Pretty print all in level order with mentor
   cityNl.sort(({ level: la }, { level: lb }) => {
     return LEVELS[la] < LEVELS[lb] ? -1 : 1;

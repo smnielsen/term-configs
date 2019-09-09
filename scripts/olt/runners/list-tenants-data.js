@@ -12,17 +12,23 @@ const limit = pLimit(10);
 const fullLog = [];
 const log = (...msg) => {
   fullLog.push(msg);
-  console.log(...msg);
+  console.log('[list-tenants]', ...msg);
+};
+
+const progress = msg => {
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(msg);
 };
 
 const success = (...msg) => {
   const [str, ...rest] = msg;
-  console.log(str.green.bold, ...rest);
+  console.log('[list-tenants]', str.green.bold, ...rest);
 };
 
 const error = (...msg) => {
   const [str, ...rest] = msg;
-  console.log(str.red.bold, ...rest);
+  console.log('[list-tenants]', str.red.bold, ...rest);
 };
 
 const buildJwt = tenant => {
@@ -82,11 +88,16 @@ const fetchAllTenants = (tenants = [], page = 0, pageSize = 100) => {
     const {
       data: { data, meta },
     } = res;
-    log(`=> Fetched page ${page} with ${data.length} results`);
+    const total = [...tenants, ...data];
+    progress(
+      `=> [${total.length}] page = ${page} found = ${data.length} results`,
+    );
     if (data.length >= meta.pageSize) {
-      return resolve(fetchAllTenants([...tenants, ...data], ++page, pageSize));
+      return resolve(fetchAllTenants(total, ++page, pageSize));
     }
-    resolve([...tenants, ...data]);
+    progress(`=> [${total.length}] completed page search..`);
+    console.log('');
+    resolve(total);
   });
 };
 
@@ -105,7 +116,7 @@ const fetchTenant = async (tenantId, index) => {
       data: { data: tenant },
     } = res;
 
-    // success(`=> ${index}: Fetched ${tenant.name} (${tenant.id})`);
+    progress(`=> Enriched tenant: ${index}`);
     return tenant;
   } catch (err) {
     if (err.response) {
@@ -122,7 +133,12 @@ const enrichTenants = async tenantIds => {
     tenantIds.map((tenantId, index) =>
       limit(() => fetchTenant(tenantId, index)),
     ),
-  ).then(tenants => tenants.filter(t => t !== null));
+  )
+    .then(tenants => {
+      console.log(''); // clear progress bar
+      return tenants;
+    })
+    .then(tenants => tenants.filter(t => t !== null));
 };
 
 const main = async (prefixes = []) => {
@@ -155,23 +171,11 @@ const main = async (prefixes = []) => {
           .length > 0,
     );
   }
-
-  // Fetch applications for all test-tenants
-  const applications = []; // await fetchAllAppsForTenants(filtered);
-
   log(`Found ${tenants.length} tenants...`);
-  log(
-    `Found`,
-    `${applications.length}`.bold,
-    'apps for',
-    `${tenants.length}`.bold,
-    'tenants',
-  );
 
   return {
     allTenantIds: tenantIds,
     tenants,
-    applications,
   };
 };
 
@@ -187,10 +191,10 @@ if (require.main === module) {
   // First prefixes
   let prefixes = (args[0] || '').split(',');
   main(prefixes)
-    .then(async ({ tenants, filtered, applications }) => {
+    .then(async ({ tenants, filtered }) => {
       await fs.writeFile(
         path.resolve(__dirname, 'output', `-${filename}-output.json`),
-        JSON.stringify({ tenants, filtered, applications }),
+        JSON.stringify({ tenants, filtered }),
       );
     })
     .catch(err => {

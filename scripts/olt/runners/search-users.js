@@ -9,22 +9,20 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 const getAdminToken = require('./admin-token');
 
-const limit = pLimit(10);
-
 const fullLog = [];
 const log = (...msg) => {
   fullLog.push(msg);
-  console.log('[list-users]', ...msg);
+  console.log('[search-users]', ...msg);
 };
 
 const success = (...msg) => {
   const [str, ...rest] = msg;
-  console.log('[list-users]', str.green.bold, ...rest);
+  console.log('[search-users]', str.green.bold, ...rest);
 };
 
 const error = (...msg) => {
   const [str, ...rest] = msg;
-  console.log('[list-users]', str.red.bold, ...rest);
+  console.log('[search-users]', str.red.bold, ...rest);
 };
 
 const keycloak = axios.create({
@@ -33,51 +31,46 @@ const keycloak = axios.create({
   headers: {},
 });
 
-const fetchAllUsers = (users = [], page = 0, pageSize = 100) => {
+const searchUsers = query => {
   return new Promise(async (resolve, reject) => {
     let res;
     try {
-      log(`# Fetching page ${page}...`);
       const token = await getAdminToken();
+      log(`Searching users...`);
       res = await keycloak({
         method: 'GET',
         url: '/v1/id/auth/admin/realms/olt/users',
         params: {
-          first: page * pageSize,
-          max: pageSize,
+          search: query,
         },
         headers: {
           Authorization: `Bearer ${token.access_token}`,
         },
       });
     } catch (err) {
-      error(`Could not fetch all users "${err.message}"`, err);
-      return reject(
-        new Error(`Could not fetch all users "${err.message}"`, err),
+      error(
+        `Error during search ${err.message}`,
+        err.toJSON ? err.toJSON() : err,
       );
+      return reject(new Error(`Could not search users "${err.message}"`, err));
     }
     if (res.status > 299) {
-      return reject(new Error(`Could not fetch all users "${res.statusText}"`));
+      return reject(new Error(`Could not search users "${res.statusText}"`));
     }
-    const { data } = res;
-    log(`=> Fetched page ${page} -> ${data.length + users.length} users`.green);
-    if (data.length >= pageSize) {
-      return resolve(fetchAllUsers([...users, ...data], ++page, pageSize));
-    }
-    resolve([...users, ...data]);
+    resolve(res.data);
   });
 };
 
-const main = async () => {
-  log('Fetching all Users...'.bold);
-  const users = await fetchAllUsers();
+const main = async query => {
+  assert(typeof query === 'string', 'invalid query. Should be a string value');
+  log(`# Searching for users...`);
+  log(`  Query = "${query.bold}"`);
+  const users = await searchUsers(query);
 
   log('------');
-  log(`==> Fetched ${users.length} users...`.bold.green);
+  success(`==> [${query}] Found ${users.length} users...`);
 
-  return {
-    users,
-  };
+  return users;
 };
 
 /**
@@ -88,7 +81,7 @@ if (require.main === module) {
   log(`Running CLI for ${filename}`);
   // Called from CLI (terminal)
   main()
-    .then(async ({ users }) => {
+    .then(async users => {
       await fs.writeFile(
         path.resolve(__dirname, 'output', `-${filename}-output.json`),
         JSON.stringify({ users }),

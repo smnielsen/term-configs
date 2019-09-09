@@ -41,7 +41,10 @@ const searchTenant = (query, tenants) => {
       matcher(tenant.billingCompany.name2)
     );
   });
-  log.success(`[search-tenants] ==> [${query}] found ${result.length} tenants`);
+  log(
+    '[search-tenants]',
+    `==> [${query}] found ${result.length} tenants`.green.bold,
+  );
   return result;
 };
 

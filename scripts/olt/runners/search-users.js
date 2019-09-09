@@ -71,7 +71,7 @@ const main = async query => {
   const users = await searchUsers(query);
 
   log('------');
-  success(`==> [${query}] Found ${users.length} users...`);
+  success(`==> [${query}] Found ${users.length} users`);
 
   return users;
 };

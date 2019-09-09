@@ -9,10 +9,13 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs').promises;
 const getAdminToken = require('./admin-token');
 
+const shouldLog = require.main === module;
 const fullLog = [];
 const log = (...msg) => {
-  fullLog.push(msg);
-  console.log('[search-users]', ...msg);
+  if (shouldLog) {
+    fullLog.push(msg);
+    console.log('[search-users]', ...msg);
+  }
 };
 
 const success = (...msg) => {

@@ -10,10 +10,13 @@ const fs = require('fs').promises;
 
 const limit = pLimit(10);
 
+const shouldLog = require.main === module;
 const fullLog = [];
 const log = (...msg) => {
-  fullLog.push(msg);
-  console.log('[admin-token]', ...msg);
+  if (shouldLog) {
+    fullLog.push(msg);
+    console.log('[admin-token]', ...msg);
+  }
 };
 
 const success = (...msg) => {

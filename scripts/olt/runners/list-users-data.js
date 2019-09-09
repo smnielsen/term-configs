@@ -11,10 +11,13 @@ const getAdminToken = require('./admin-token');
 
 const limit = pLimit(10);
 
+const shouldLog = require.main === module;
 const fullLog = [];
 const log = (...msg) => {
-  fullLog.push(msg);
-  console.log('[list-users]', ...msg);
+  if (shouldLog) {
+    fullLog.push(msg);
+    console.log('[list-users]', ...msg);
+  }
 };
 
 const success = (...msg) => {

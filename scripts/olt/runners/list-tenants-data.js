@@ -9,10 +9,13 @@ const fs = require('fs').promises;
 
 const limit = pLimit(10);
 
+const shouldLog = require.main === module;
 const fullLog = [];
 const log = (...msg) => {
-  fullLog.push(msg);
-  console.log('[list-tenants]', ...msg);
+  if (shouldLog) {
+    fullLog.push(msg);
+    console.log('[list-tenants]', ...msg);
+  }
 };
 
 const progress = msg => {
@@ -95,7 +98,7 @@ const fetchAllTenants = (tenants = [], page = 0, pageSize = 100) => {
     if (data.length >= meta.pageSize) {
       return resolve(fetchAllTenants(total, ++page, pageSize));
     }
-    progress(`=> [${total.length}] completed page search..`);
+    progress(`=> [${total.length}] Pages = ${page} & pageSize = ${pageSize}`);
     console.log('');
     resolve(total);
   });

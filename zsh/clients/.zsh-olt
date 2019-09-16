@@ -1,3 +1,0 @@
-## Setup Aliases
-alias olt-read-errors="node $SMN_CONFIG_DIR/scripts/olt/list-create-errors.js"
-alias olt-kafka-send="node $SMN_CONFIG_DIR/scripts/olt/kafka-sender.js"

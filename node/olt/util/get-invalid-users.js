@@ -90,7 +90,12 @@ if ((require.main = module)) {
 
   main().then(async output => {
     await fs.writeFile(
-      path.resolve(__dirname, 'output', `-${filename}-output.json`),
+      path.resolve(
+        __dirname,
+        '../../../',
+        'output',
+        `-${filename}-output.json`,
+      ),
       JSON.stringify(output),
     );
   });

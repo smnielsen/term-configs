@@ -196,7 +196,12 @@ if (require.main === module) {
   main(prefixes)
     .then(async ({ tenants, filtered }) => {
       await fs.writeFile(
-        path.resolve(__dirname, 'output', `-${filename}-output.json`),
+        path.resolve(
+          __dirname,
+          '../../../',
+          'output',
+          `-${filename}-output.json`,
+        ),
         JSON.stringify({ tenants, filtered }),
       );
     })

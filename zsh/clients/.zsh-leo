@@ -1,6 +1,0 @@
-## Setup Aliases
-alias update-leo='git-update --prefix leo'
-
-alias leo-gcp-envs="$SMN_CONFIG_DIR/scripts/leo/leo-gcp.sh -m envs $@"
-alias leo-gcp-start="$SMN_CONFIG_DIR/scripts/leo/leo-gcp.sh -m start $@"
-alias leo-gcp-help="$SMN_CONFIG_DIR/scripts/leo/leo-gcp.sh -m help"

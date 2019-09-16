@@ -35,10 +35,7 @@ const keycloak = axios.create({
   headers: {},
 });
 
-let adminPassword = process.env.KC_ADMIN_PASS;
-assert(adminPassword, 'Missing admin password on process.env.KC_ADMIN_PASS');
-
-const getAdminToken = async () => {
+const getAdminToken = async adminPassword => {
   let res;
   try {
     res = await keycloak.post(
@@ -54,14 +51,21 @@ const getAdminToken = async () => {
 
     return token;
   } catch (err) {
-    error(`Could not fetch all tenants "${err.message}"`, err);
+    error(
+      `Could not fetch admin token "${err.message}"`,
+      err.toJSON ? err.toJSON() : err,
+    );
     throw err;
   }
 };
 
-const main = async () => {
+const main = async (adminPassword = process.env.KC_ADMIN_PASS) => {
+  assert(
+    adminPassword,
+    '[admin-token] Missing admin password (process.env.KC_ADMIN_PASS)',
+  );
   log('Fetching admin token');
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
 
   return token;
 };

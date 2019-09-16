@@ -115,14 +115,14 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-git
 # Load Cloud bytes algorithms
 source ${SMN_CONFIG_DIR}/zsh/.zsh-bytes
 
-# Load OLT stuff
-source ${SMN_CONFIG_DIR}/zsh/clients/.zsh-olt
-
 loaded "zsh-sources"
 # Load Zgen
 loading "zgen"
 source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
 loaded "zgen"
+
+# Custom aliases
+source ${SMN_CONFIG_DIR}/zsh/.zsh-scripts
 
 end=$(date +%s)
 printf "\033[34;1m Loaded all: \033[0m $((($end-$start) % 60))s\n"

@@ -20,20 +20,26 @@ The script will start by creating a number of clients (NUMBER_OF_CLIENTS), then 
 The script will run these sessions in regards to how many runs (NUMBER_OF_RUNS) are configured (default: 1).
 
 The level (LEVEL) states the logging level. Set to "prod" if only summaries should be printed.
-
-```
-$ node clients-performance-test.js [NUMBER_OF_CLIENTS] [NUMBER_OF_RUNS] [LEVEL]
-```
  */
 require('colors');
 const path = require('path');
 const fs = require('fs').promises;
 const axios = require('axios');
 const pLimit = require('p-limit');
+const getAdminToken = require('../../util/admin-token');
 
-const amount = parseInt(process.argv[2] || 10, 10);
-const rounds = process.argv[3] || 1;
-const level = process.argv[4];
+/**************************
+ * VARIABLES
+ **************************/
+let host;
+let adminPassword;
+
+let amount;
+let rounds;
+let level;
+/**************************
+ * END OF VARIABLES
+ **************************/
 
 let logString = '';
 const log = (...msg) => {
@@ -69,9 +75,6 @@ const debug = (...msg) => {
   }
 };
 
-const host = 'http://localhost:8080';
-const adminPass = 'secureadmin';
-
 const validations = {
   UPDATE: {
     approvedMs: 1000,
@@ -99,35 +102,8 @@ const randomNumber = (min, max) => {
 const formUrlEncoded = x =>
   Object.keys(x).reduce((p, c) => `${p}&${c}=${encodeURIComponent(x[c])}`, '');
 
-const getAdminToken = async () => {
-  const internalUrl = `${host}/v1/id/auth/realms/master/protocol/openid-connect/token`;
-  //  log('Get token', internalUrl);
-  try {
-    const res = await axios({
-      method: 'post',
-      url: internalUrl,
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      data: formUrlEncoded({
-        client_id: 'admin-cli',
-        grant_type: 'password',
-        username: 'admin',
-        password: adminPass,
-      }),
-    });
-
-    if (res.status > 299) {
-      throw new Error(`Could not get token: ${res.statusText}`);
-    }
-
-    return res.data.access_token;
-  } catch (err) {
-    log('ERROR', err);
-    throw err;
-  }
-};
-
 const getClient = async id => {
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
   const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${id}`;
   const res = await axios({
     method: 'get',
@@ -146,7 +122,7 @@ const getClient = async id => {
 };
 
 const getAllClients = async () => {
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
   const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients`;
   const res = await axios({
     method: 'get',
@@ -212,18 +188,15 @@ const createClient = async (token, override = {}) => {
   } catch (err) {
     const res = err.response;
     debug(
-      `=> ${internalCount}: Could not create client ${id}: ${res.status}-${
-        res.statusText
-      }`.red,
+      `=> ${internalCount}: Could not create client ${id}: ${res.status}-${res.statusText}`
+        .red,
     );
     return { status: res.status, statusText: res.statusText, data: res.data };
   }
 };
 const getClientSecret = async client => {
-  const token = await getAdminToken();
-  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${
-    client.id
-  }/client-secret`;
+  const token = await getAdminToken(adminPassword);
+  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${client.id}/client-secret`;
   const res = await axios({
     method: 'get',
     url: internalUrl,
@@ -270,9 +243,8 @@ const testTokenClient = async client => {
   } catch (err) {
     const res = err.response;
     debug(
-      `Could not get token for client ${client.id}: ${res.status}-${
-        res.statusText
-      }`.red,
+      `Could not get token for client ${client.id}: ${res.status}-${res.statusText}`
+        .red,
     );
     return {
       status: res.status,
@@ -284,12 +256,10 @@ const testTokenClient = async client => {
 };
 
 const testUpdateClient = async client => {
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
 
   const startTime = Date.now();
-  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${
-    client.id
-  }`;
+  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${client.id}`;
   const data = {
     clientId: client.id,
     redirectUris: ['http://localhost:8080/auth', 'http://127.0.0.1:8080/auth'],
@@ -325,12 +295,10 @@ const testUpdateClient = async client => {
   }
 };
 const testDeleteClient = async client => {
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
 
   const startTime = Date.now();
-  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${
-    client.id
-  }`;
+  const internalUrl = `${host}/v1/id/auth/admin/realms/olt/clients/${client.id}`;
   try {
     await axios({
       method: 'delete',
@@ -377,7 +345,7 @@ const createPublicClient = token => {
 const runCreation = async () => {
   // Get token
   debug('Creating one client...');
-  const token = await getAdminToken();
+  const token = await getAdminToken(adminPassword);
   debug('Got Admin Token');
   // Create Clients
   if (count % 2 === 0) {
@@ -570,33 +538,59 @@ async function run() {
   return run();
 }
 
-const start = Date.now();
-run()
-  .then(async () => {
-    const allClients = await getAllClients();
-    const outputDir = path.resolve(__dirname, 'output/performance');
-    await fs.writeFile(
-      `${outputDir}/latest-perf-result.json`,
-      JSON.stringify(outputResult),
-    );
-    await fs.writeFile(`${outputDir}/latest-perf-result.log`, logString);
-    const outputDirHistory = path.resolve(
-      __dirname,
-      'output/performance/history',
-    );
-    await fs.writeFile(
-      `${outputDirHistory}/${allClients.length}-latest-perf-result.json`,
-      JSON.stringify(outputResult),
-    );
-    await fs.writeFile(
-      `${outputDirHistory}/${allClients.length}-latest-perf-result.log`,
-      logString,
-    );
-    return outputResult;
-  })
-  .catch(err => {
-    log(
-      `performance test failed after: ${prettyPrintDiff(Date.now() - start)}`,
-    );
-    log(`${err.message}`.red, err.response ? err.response.data : err);
-  });
+const testConnection = async () => {
+  log('Testing connection to Keycloak...');
+  try {
+    await getAdminToken(adminPassword);
+  } catch (err) {
+    log(`ERROR: Keycloak connection test failed...`);
+    throw err;
+  }
+};
+
+module.exports = async (config, options) => {
+  host = config.host;
+  adminPassword = config.adminPassword;
+
+  amount = options.amount;
+  rounds = options.rounds;
+  level = options.level;
+
+  await testConnection();
+
+  const start = Date.now();
+  return run()
+    .then(async () => {
+      const allClients = await getAllClients();
+      const outputDir = path.resolve(
+        __dirname,
+        '../../../',
+        'output/performance',
+      );
+      await fs.writeFile(
+        `${outputDir}/latest-perf-result.json`,
+        JSON.stringify(outputResult),
+      );
+      await fs.writeFile(`${outputDir}/latest-perf-result.log`, logString);
+      const outputDirHistory = path.resolve(
+        __dirname,
+        '../../../',
+        'output/performance/history',
+      );
+      await fs.writeFile(
+        `${outputDirHistory}/${allClients.length}-latest-perf-result.json`,
+        JSON.stringify(outputResult),
+      );
+      await fs.writeFile(
+        `${outputDirHistory}/${allClients.length}-latest-perf-result.log`,
+        logString,
+      );
+      return outputResult;
+    })
+    .catch(err => {
+      log(
+        `performance test failed after: ${prettyPrintDiff(Date.now() - start)}`,
+      );
+      log(`${err.message}`.red, err.response ? err.response.data : err);
+    });
+};

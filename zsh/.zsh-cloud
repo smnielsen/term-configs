@@ -35,6 +35,12 @@ k-gcp() {
     gcloud container clusters get-credentials ${cluster} --zone ${zone};
 }
 
+az-logs() {
+    local app=$1
+    local env=${2:-bin-dev}
+    az login --service-principal -u ${AZ_SP_LOG_READER_NAME} -p ${AZ_SP_LOG_READER_PASSWORD} --tenant ${AZ_SP_LOG_READER_TENANT}
+    az webapp log tail --resource-group bin-dev --name ${env}-${app}
+}
 
 ### Azure: Login to Azure and set cluster
 k-az() {

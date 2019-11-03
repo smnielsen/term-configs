@@ -1,47 +1,58 @@
 require('colors');
 const inquirer = require('inquirer');
+const program = require('commander');
 
+const gdprConfig = require('./gdpr-config');
 const gdprRequest = require('./gdpr-request');
+
+// Setup commander interface
+program
+  .option('-n, --name <name>', 'Set the name of the person')
+  .option('-e, --email <email>', 'Set the email of the person')
+  .option('-a, --address <address>', 'Set the email of the person (within "")')
+  .option('-p, --password <password>', 'Admin password for current k8s env');
 
 const run = async () => {
   console.log('>> Running GDPR module'.bold);
-  const { name, email, address, adminPassword } = await inquirer.prompt([
+  const data = program.parse(process.argv);
+
+  const input = await inquirer.prompt([
     {
       name: 'name',
       type: 'input',
       message: 'The name:',
-      default: 'Simon Nielsen',
+      default: data.name,
     },
     {
       name: 'email',
       type: 'input',
       message: 'The email:',
-      default: 'simon.nielsen@netlight.com',
+      default: data.email,
     },
     {
       name: 'address',
       type: 'input',
       message: 'The address (street + number):',
-      default: 'Stralauer Allee 23C',
-    },
-    {
-      name: 'adminPassword',
-      type: 'password',
-      message: 'Admin password for current Kubernetes env',
-      default: process.env.KC_ADMIN_PASS,
+      default: data.address || 'empty',
     },
   ]);
 
-  return gdprRequest(
+  const { adminPassword } = await inquirer.prompt([
     {
-      name,
-      email,
-      address,
+      name: 'adminPassword',
+      type: 'input',
+      message: 'Admin password for current Kubernetes env',
+      default: process.env.KC_ADMIN_PASS || data.password,
     },
-    adminPassword,
-  );
+  ]);
+
+  return gdprRequest(input, adminPassword);
 };
 
-run().catch(err => {
-  console.log(`>> Script error ${err.message}`.red);
-});
+if (require.main === module) {
+  run().catch(err => {
+    console.log(`>> Script error ${err.message}`.red);
+  });
+}
+
+module.exports = run;

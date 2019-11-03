@@ -104,8 +104,9 @@ const fetchAllTenants = (tenants = [], page = 0, pageSize = 100) => {
   });
 };
 
-const fetchTenant = async (tenantId, index) => {
+const fetchTenant = async (tenantId, index, { includeUsers } = {}) => {
   try {
+    progress(`=> Enriching tenant: ${index}`);
     // log(`§ ${index}: Fetching tenant ${tenantId}...`);
     const res = await idService({
       method: 'GET',
@@ -119,7 +120,10 @@ const fetchTenant = async (tenantId, index) => {
       data: { data: tenant },
     } = res;
 
-    progress(`=> Enriched tenant: ${index}`);
+    if (includeUsers) {
+      tenant.users = await fetchAllUsers(tenantId);
+    }
+
     return tenant;
   } catch (err) {
     if (err.response) {
@@ -131,10 +135,55 @@ const fetchTenant = async (tenantId, index) => {
   }
 };
 
-const enrichTenants = async tenantIds => {
+const fetchAllUsers = (tenantId, users = [], page = 0, pageSize = 10) => {
+  return new Promise(async (resolve, reject) => {
+    let res;
+    try {
+      res = await idService({
+        method: 'GET',
+        url: `/v1/tenants/${tenantId}/users`,
+        headers: {
+          Authorization: `Bearer ${buildJwt(tenantId)}`,
+        },
+        params: {
+          page,
+          pageSize,
+        },
+      });
+    } catch (err) {
+      error(
+        `Could not fetch all users for tenant ${tenantId} "${err.message}"`,
+        err,
+      );
+      return reject(
+        new Error(
+          `Could not fetch all users for tenant ${tenantId} "${err.message}"`,
+          err,
+        ),
+      );
+    }
+    if (res.status > 299) {
+      return reject(
+        new Error(
+          `Could not fetch all users for tenant ${tenantId} "${res.statusText}"`,
+        ),
+      );
+    }
+    const {
+      data: { data, meta },
+    } = res;
+    const total = [...users, ...data];
+    if (data.length >= meta.pageSize) {
+      return resolve(fetchAllUsers(tenantId, total, ++page, pageSize));
+    }
+    resolve(total);
+  });
+};
+
+const enrichTenants = async (tenantIds, { includeUsers } = {}) => {
   return Promise.all(
     tenantIds.map((tenantId, index) =>
-      limit(() => fetchTenant(tenantId, index)),
+      limit(() => fetchTenant(tenantId, index, { includeUsers })),
     ),
   )
     .then(tenants => {
@@ -144,7 +193,7 @@ const enrichTenants = async tenantIds => {
     .then(tenants => tenants.filter(t => t !== null));
 };
 
-const main = async (prefixes = []) => {
+const main = async ({ includeUsers = false, prefixes = [] }) => {
   try {
     await idService({
       method: 'GET',
@@ -163,7 +212,7 @@ const main = async (prefixes = []) => {
 
   log(`=> Enriching ${tenantIds.length} tenants...`);
   // We need the name to find test tenants
-  const enriched = await enrichTenants(tenantIds);
+  const enriched = await enrichTenants(tenantIds, { includeUsers });
 
   // Filter test tenants
   let tenants = enriched;
@@ -193,7 +242,7 @@ if (require.main === module) {
 
   // First prefixes
   let prefixes = (args[0] || '').split(',');
-  main(prefixes)
+  main({ prefixes })
     .then(async ({ tenants, filtered }) => {
       await fs.writeFile(
         path.resolve(

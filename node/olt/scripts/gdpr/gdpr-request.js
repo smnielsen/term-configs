@@ -41,7 +41,7 @@ const recursiveSearch = (matcher, obj, keyStr) => {
     .filter(obj => obj.match !== null);
 };
 
-const searchTenant = (query, tenants) => {
+const searchTenantInfo = (query, tenants) => {
   const matcher = createMatcher(query || '');
   const result = tenants.filter(tenant => {
     return (
@@ -66,27 +66,70 @@ const searchTenant = (query, tenants) => {
   return result;
 };
 
+const searchTenantRoles = (allFoundUsers = [], allExistingTenants = []) => {
+  return allExistingTenants.filter(existingTenant => {
+    if (!existingTenant.users || existingTenant.users.length === 0) {
+      // This tenant has not loaded users
+      return false;
+    }
+    const foundExistingUserTenant = existingTenant.users.find(tenantUser => {
+      const foundUserInTenant = allFoundUsers.find(
+        foundUser => foundUser.id === tenantUser.id,
+      );
+      if (foundUserInTenant) {
+        return true;
+      }
+      return false;
+    });
+    if (foundExistingUserTenant) {
+      return true;
+    }
+    return false;
+  });
+};
+
 async function main(gdprUser, adminPassword) {
   log.info('Running GDPR Request for...');
   log(gdprUser);
-  const { tenants: allTenants } = await getTenants();
-  log.info(`Searching through ${allTenants.length} tenants..`.bold);
-
-  const tenants = Object.keys(gdprUser)
-    .map(async key => {
-      log(`> {tenants} Searching "${gdprUser[key]}" on "${key}" key`.italic);
-      return searchTenant(gdprUser[key], allTenants);
-    })
-    .flat();
 
   log.info(`Searching through users..`.bold);
-  const users = (await Promise.all(
+  let users = (await Promise.all(
     Object.keys(gdprUser).map(async key => {
       log(`> {users} Searching "${gdprUser[key]}" on "${key}" key`.italic);
       return searchUsers(gdprUser[key], adminPassword);
     }),
   )).flat();
+  users = users.filter((u, i) => users.findIndex(us => us.id === u.id) === i);
 
+  log.success(`==> found in total ${users.length} users`, users);
+
+  const { tenants: allTenants } = await getTenants({ includeUsers: true });
+  log.info(`Searching through ${allTenants.length} tenants..`.bold);
+
+  const userInfoTenants = Object.keys(gdprUser)
+    .map(async key => {
+      log(`> {tenants} Searching "${gdprUser[key]}" on "${key}" key`.italic);
+      return searchTenantInfo(gdprUser[key], allTenants);
+    })
+    .flat()
+    .filter(t => Object.keys(t).length > 0);
+
+  log(
+    `> {tenants-via-roles} Searching "${gdprUser.name}" for any association through roles`
+      .italic,
+  );
+  const userRoleTenants = searchTenantRoles(users, allTenants);
+
+  log(
+    '[tenants-via-roles]',
+    `==> found ${userRoleTenants.length} tenants`.green.bold,
+  );
+
+  const tenants = [...userInfoTenants, ...userRoleTenants];
+  log.success(
+    `==> found in total ${tenants.length} tenants`.green.bold,
+    tenants,
+  );
   return {
     tenants,
     users,
@@ -101,7 +144,10 @@ module.exports = (gdprUser, adminPassword) => {
       const output = path.resolve(
         __dirname,
         '../../../../output',
-        `-${filename.replace('.js', `-${gdprUser.name}-output.json`)}`,
+        `-${filename.replace(
+          '.js',
+          `-${gdprUser.name.replace(/ /g, '-')}-output.json`,
+        )}`,
       );
       await fs.writeFile(output, JSON.stringify({ users, tenants }));
       log(``);

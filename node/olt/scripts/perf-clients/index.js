@@ -44,6 +44,10 @@ const run = async () => {
   return clientPerfTest({ host, adminPassword }, { amount, rounds, level });
 };
 
-run().catch(err => {
-  console.log(`>> Script error ${err.message}`.red);
-});
+if (require.main === module) {
+  run().catch(err => {
+    console.log(`>> Script error ${err.message}`.red);
+  });
+}
+
+module.exports = run;

@@ -3,20 +3,6 @@
 SCRIPTS_REL_PATH="scripts"
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
-########################################
-## OSRAM LIGHTELLIGENCE
-########################################
 NODE_DIR=${SCRIPTPATH/zsh/node}
-function setup_node_aliases() {
-    local base=$1
-    for dir in ${NODE_DIR}/${base}/scripts/*; do
-        aliasKey="${base}-$(basename $dir)"
-        aliasValue="node ${dir}/index.js"
-        alias ${aliasKey}=${aliasValue}
-        echo ":: ${aliasKey}"
-    done
-}
 
-echo ">> Setting up custom aliases..."
-setup_node_aliases "olt"
-setup_node_aliases "nl"
+alias smn="node ${NODE_DIR}/index.js"

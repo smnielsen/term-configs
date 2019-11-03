@@ -35,6 +35,9 @@ export EDITOR=/usr/bin/nano
 # export JAVA_HOME=`/usr/libexec/java_home -v 1.8`
 # export MAVEN_OPTS="-Xms512m -Xmx1024m"
 
+### User PATHS
+export PATH=/Users/sini/.bin:$PATH
+
 # Set PYTHONPATH
 export PYTHONPATH=usr/bin
 

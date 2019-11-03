@@ -21,7 +21,10 @@ const run = async () => {
   const kafkaModule = require(`./kafka-${TYPE}.js`);
   return kafkaModule(KAFKA_BROKER);
 };
+if (require.main === module) {
+  run().catch(err => {
+    console.log(`>> Script error ${err.message}`.red);
+  });
+}
 
-run().catch(err => {
-  console.log(`>> Script error ${err.message}`.red);
-});
+module.exports = run;

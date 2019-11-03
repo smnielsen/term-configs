@@ -18,20 +18,27 @@ const LEVELS = {
   P: 7,
 };
 
-async function main() {
-  const city = process.argv[2];
+const getColleagues = async colleagues => {
+  if (!colleagues || colleagues.length === 0) {
+    // Read input
+    const input = path.resolve(__dirname, `input-mentors.json`);
+    const res = await fs.readFile(input);
+    return JSON.parse(res).data;
+  }
+  return colleagues;
+};
+
+async function main(cityArg, inputColleagues) {
+  const city = cityArg || process.argv[2];
   assert(city, 'Please define city as first parameter');
   log('# Checking mentors in', city.blue.bold);
 
-  // Read input
-  const input = path.resolve(__dirname, `input-mentors.json`);
-  const res = await fs.readFile(input);
-  const data = JSON.parse(res).data;
+  const colleagues = await getColleagues(inputColleagues);
 
   const isInOffice = nler => nler.office.toLowerCase() === city.toLowerCase();
   // Map data to persons
   // prettier-ignore
-  let netlighters = data.reduce((persons, [id, email, mentor, level, doing, link, office, fullName, phoneNumber, { "0": imageUrl }]) => {
+  let netlighters = colleagues.reduce((persons, [id, email, mentor, level, doing, link, office, fullName, phoneNumber, { "0": imageUrl }]) => {
     return [
       ...persons,
       {
@@ -143,4 +150,4 @@ async function main() {
   log(`Done`.green);
 }
 
-main().catch(err => log(`Failed with\n ${err.message}`.red));
+module.exports = main;

@@ -1,0 +1,23 @@
+{
+  "name": "config",
+  "version": "1.0.0",
+  "description": "Configuration files to be used in Terminal",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smnielsen/config.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smnielsen/config/issues"
+  },
+  "homepage": "https://github.com/smnielsen/config#readme",
+  "devDependencies": {
+    "eslint": "^6.6.0",
+    "prettier": "^1.19.1"
+  }
+}

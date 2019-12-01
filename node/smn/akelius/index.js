@@ -1,17 +1,17 @@
 require('colors');
 const inquirer = require('inquirer');
-const path = require('path');
+const getCookieAuth = require('../../util/get-cookie-auth');
 const getColleagues = require('../../util/get-colleagues');
 const mentors = require('./mentors');
-const CliTable = require('cli-table');
 
 const run = async () => {
   console.log('>> Running MENTORS module'.bold);
-  
-  const colleagues = await getColleagues();
+
+  const authCookie = await getCookieAuth();
+  const colleagues = await getColleagues(authCookie);
 
   console.log(`== ${colleagues.length} colleagues ==`.green.bold);
-  const { office, sorting } = await inquirer.prompt([
+  const { office } = await inquirer.prompt([
     {
       name: 'office',
       type: 'list',
@@ -28,19 +28,9 @@ const run = async () => {
         'zurich',
       ],
     },
-    {
-      name: 'sorting',
-      type: 'list',
-      message: 'Choose sorting',
-      default: 'level',
-      choices: [
-        'level',
-        'match',
-      ],
-    },
   ]);
 
-  return mentors(colleagues, { office, sorting });
+  return mentors(office, colleagues);
 };
 
 if (require.main === module) {

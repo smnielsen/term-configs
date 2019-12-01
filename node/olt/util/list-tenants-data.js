@@ -1,4 +1,5 @@
 require('colors');
+const _ = require('lodash');
 const request = require('request');
 const path = require('path');
 const axios = require('axios');
@@ -14,8 +15,8 @@ const fullLog = [];
 const log = (...msg) => {
   if (shouldLog) {
     fullLog.push(msg);
-    console.log('[list-tenants]', ...msg);
   }
+  console.log('[list-tenants]', ...msg);
 };
 
 const progress = msg => {
@@ -165,7 +166,9 @@ const fetchAllUsers = (tenantId, users = [], page = 0, pageSize = 10) => {
     if (res.status > 299) {
       return reject(
         new Error(
-          `Could not fetch all users for tenant ${tenantId} "${res.statusText}"`,
+          `Could not fetch all users for tenant ${tenantId} "${
+            res.statusText
+          }"`,
         ),
       );
     }
@@ -193,7 +196,11 @@ const enrichTenants = async (tenantIds, { includeUsers } = {}) => {
     .then(tenants => tenants.filter(t => t !== null));
 };
 
-const main = async ({ includeUsers = false, prefixes = [] }) => {
+const main = async ({
+  excludeProperties = [],
+  includeUsers = false,
+  prefixes = [],
+} = {}) => {
   try {
     await idService({
       method: 'GET',
@@ -223,7 +230,21 @@ const main = async ({ includeUsers = false, prefixes = [] }) => {
           .length > 0,
     );
   }
+  log('');
   log(`Found ${tenants.length} tenants...`);
+
+  if (excludeProperties.length > 0) {
+    log(`Excluding ${JSON.stringify(excludeProperties)} properties`);
+    tenants = tenants.map(tenant => {
+      let clone = {
+        ...tenant,
+      };
+      excludeProperties.forEach(path => {
+        _.unset(clone, path);
+      });
+      return clone;
+    });
+  }
 
   return {
     allTenantIds: tenantIds,

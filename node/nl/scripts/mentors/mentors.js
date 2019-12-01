@@ -2,6 +2,7 @@ require('colors');
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs').promises;
+const CliTable = require('cli-table');
 
 const log = (...msg) => {
   console.log(...msg);
@@ -28,14 +29,15 @@ const getColleagues = async colleagues => {
   return colleagues;
 };
 
-async function main(cityArg, inputColleagues) {
-  const city = cityArg || process.argv[2];
-  assert(city, 'Please define city as first parameter');
-  log('# Checking mentors in', city.blue.bold);
+async function main(inputColleagues, { sorting: sortArg, office: officeArg } = {}) {
+  const mainOffice = officeArg || process.argv[2];
+  assert(mainOffice, 'Please define office as first parameter');
+  const sorting = sortArg || process.argv[3];
+  log('# Checking mentors in', mainOffice.blue.bold);
 
   const colleagues = await getColleagues(inputColleagues);
 
-  const isInOffice = nler => nler.office.toLowerCase() === city.toLowerCase();
+  const isInOffice = nler => nler.office.toLowerCase() === mainOffice.toLowerCase();
   // Map data to persons
   // prettier-ignore
   let netlighters = colleagues.reduce((persons, [id, email, mentor, level, doing, link, office, fullName, phoneNumber, { "0": imageUrl }]) => {
@@ -83,7 +85,7 @@ async function main(cityArg, inputColleagues) {
     const mentees = mappedByMentor[mentorId];
     const mentor = mentees[0].mentor;
     log(
-      `${mentor.office.toLowerCase() === city.toLowerCase() ? '✅' : '⚠️'} ${
+      `${mentor.office.toLowerCase() === mainOffice.toLowerCase() ? '✅' : '⚠️'} ${
         mentor.fullName === 'unknown' ? 'No mentor' : mentor.fullName
       } in "${mentor.office}" (${mentees.length} mentees):`.bold,
     );
@@ -104,32 +106,77 @@ async function main(cityArg, inputColleagues) {
 
   // Filter city
   const cityNl = netlighters.filter(
-    ({ office }) => office.toLowerCase() === city.toLowerCase(),
+    ({ office }) => office.toLowerCase() === mainOffice.toLowerCase(),
   );
   // Pretty print all in level order with mentor
-  cityNl.sort(({ level: la }, { level: lb }) => {
-    return LEVELS[la] < LEVELS[lb] ? -1 : 1;
+
+  /**
+   * Time to Print
+   */
+  const table = new CliTable({
+    head: ['', 'Level'.blue.bold, 'Name'.blue.bold, 'Role'.blue.bold, 'Mentor'.blue.bold, 'Mentor-Office'.blue.bold]
+  , colWidths: [7, 7, 30, 15, 30, 15]
   });
+
+  const sorts = {
+    'level': ({ level: la }, { level: lb }) => {
+      return LEVELS[la] < LEVELS[lb] ? -1 : 1;
+    },
+    'match': ({ office: oa, level: la, mentor: ma }, { office: ob, level: lb, mentor: mb }) => {
+      if (ma.office === oa) {
+        return 1
+      }
+      if (mb.office === ob) {
+        return -1
+      }
+      if (LEVELS[ma.level] < 6) {        
+        if (LEVELS[mb.level] < 6) {
+          return LEVELS[la] < LEVELS[lb] ? -1 : 1
+        }
+        return -1
+      }
+      if (LEVELS[mb.level] < 6) {
+        if (LEVELS[ma.level] < 6) {
+          return LEVELS[la] < LEVELS[lb] ? -1 : 1
+        }
+        return 1
+      }
+      return LEVELS[la] < LEVELS[lb] ? -1 : 1
+    },
+  }
+
+  cityNl.sort(sorts[sorting] || sorts.level);
   const result = cityNl.reduce(
     (split, nler) => {
       const { fullName, level, office, mentor, doing } = nler;
-      const msg = `(${level}) ${fullName} has mentor ${mentor.fullName} on ${mentor.level} in office ${mentor.office}`;
       const sameOffice = mentor.office === office;
       let update = {};
+      let tableData = []
       if (sameOffice) {
-        log(`✅ ${msg.green}`);
+        tableData.push()
+        table.push([
+          'OK'.green.bold,
+          level,
+          fullName,
+          doing,
+          mentor.fullName,
+          mentor.office
+        ])
         update = {
           ...split,
           same: [...split.same, nler],
         };
       } else {
-        log(
-          LEVELS[mentor.level] < 6
-            ? `❌ ${msg.red}`
-            : mentor.level
-            ? `👵 ${msg}`
-            : `⚠️  ${msg.yellow}`,
-        );
+        let color = LEVELS[mentor.level] < 6 ? '$'.red.bold : '$'.yellow.bold
+        table.push([
+          LEVELS[mentor.level] < 6 ? 'NO'.red.bold : 'MAYBE'.yellow.bold,
+          color.replace('$', level),
+          color.replace('$', fullName),
+          color.replace('$', doing),
+          color.replace('$', mentor.fullName),
+          color.replace('$', mentor.office),
+        ])
+        tableData.push()
         update = {
           ...split,
           others: [...split.others, nler],
@@ -138,14 +185,17 @@ async function main(cityArg, inputColleagues) {
           missing: split.missing + (mentor.level ? 0 : 1),
         };
       }
+      
       return update;
     },
     { same: [], others: [], countSwitchProposal: 0, missing: 0 },
   );
+  log(table.toString())
   log('...');
-  log(`=> ${result.others.length} in ${city} has mentors in other offices`);
+  log(`=> ${result.others.length} in ${mainOffice} has mentors in other offices`);
   log(`=>❌ ${result.countSwitchProposal} should switch mentor?`.blue);
   log(`=>⚠️  ${result.missing} is missing a mentor!`.yellow);
+
 
   log(`Done`.green);
 }

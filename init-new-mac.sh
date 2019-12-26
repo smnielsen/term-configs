@@ -1,8 +1,13 @@
-#!/bin/bash
+#/bin/bash
 start=$(date +%s)
 log() {
   local t=$1
   printf "  \033[97;m$t\033[0m\n"
+}
+
+bold() {
+  local t=$1
+  echo -e "\033[1m$t\033[0m"
 }
 
 STEP_COUNT=0
@@ -151,11 +156,11 @@ MANUAL=(
 )
 
 step "Installation of a new Mac OS X Computer"
-log "Setup is done with no promise of success"
+log "Setup is run with no promise of success"
 log "* Will reset applications"
 log "* Will remove already set configs"
 log "Make sure to follow progress when configuring system initially..."
-log "Continuing is done on your own risk."
+bold "Continuing is on your own risk."
 log "    ¯\_(ツ)_/¯      "
 while true; do
   read -p "Do you wish to continue (y/n)? " yn
@@ -194,8 +199,8 @@ fi
 ###############################
 ## SETUP GIT CONFIG
 step "Git Configuration"
-read -p "Git Name (Empty=\"Simon Nielsen\"): " gn
-read -p "Git Email (Empty=\"simonnielsen@live.se\"): " ge
+read -p "Git Name (Default=\"Simon Nielsen\"): " gn
+read -p "Git Email (Default=\"simonnielsen@live.se\"): " ge
 GITHUB_NAME=${gn:-"Simon Nielsen"}
 GITHUB_EMAIL=${ge:-"simonnielsen@live.se"}
 git config --global user.name ${GITHUB_NAME}
@@ -252,7 +257,6 @@ echo ""
 ###############################
 # Setup dev dirs
 mkdir -p ${HOME}/dev
-mkdir -p ${HOME}/dev/private
 
 ###############################
 ## INSTALL ALL APPLICATIONS

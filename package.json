@@ -1,6 +1,6 @@
 {
   "name": "@smnielsen/config",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Configuration files to be used in iterm",
   "main": ".eslintrc.js",
   "scripts": {

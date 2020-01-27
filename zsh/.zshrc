@@ -18,13 +18,24 @@ loading "oh-my-zsh"
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
 
+# Set default theme
+# ZSH_THEME="robbyrussell"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
-plugins=(git)
+plugins=()
+# plugins+=(history history-substring-search httpie sudo vagrant postgres)
+# plugins+=(osx node npm )
+# plugins+=(zsh-syntax-highlighting zsh-history-substring-search zsh-autosuggestions)
+# plugins+=(zsh-completions alias-tips almostontop)
 
 # Load zsh
 source $ZSH/oh-my-zsh.sh
 
 loaded "oh-my-zsh"
+# Load Zgen
+loading "zgen"
+source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
+loaded "zgen"
+
 ##################################
 ## SETUP ENVIRONMENT VARIABLES
 loading "env-vars"
@@ -54,7 +65,10 @@ export PATH=/usr/local/bin:$PATH
 export PATH=$PATH:/usr/local/sbin
 
 ### Add Python to PATH
-export PATH=$PATH:~/Library/Python/3.6/bin
+export PATH="$PATH:$HOME/Library/Python/3.7/bin"
+
+### Add flutter to PATH
+export PATH="$PATH:$HOME/dev/tools/flutter/bin"
 
 ### Add RVM to PATH for scripting
 export PATH="$PATH:$HOME/.rvm/bin"
@@ -71,8 +85,10 @@ loaded "env-vars"
 
 ### Load nvm
 loading "nvm"
+
 export NVM_DIR="$HOME/.nvm"
-source /usr/local/opt/nvm/nvm.sh
+lazyload 'source /usr/local/opt/nvm/nvm.sh' nvm
+
 loaded "nvm"
 
 #### Load Fuzzy Finder
@@ -122,10 +138,6 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-golang
 source ${SMN_CONFIG_DIR}/zsh/.zsh-scripts
 
 loaded "zsh-sources"
-# Load Zgen
-loading "zgen"
-source ${SMN_CONFIG_DIR}/zsh/.zsh-zgen
-loaded "zgen"
 
 end=$(date +%s)
 printf "\033[34;1m Loaded all: \033[0m $((($end-$start) % 60))s\n"

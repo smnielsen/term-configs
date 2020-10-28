@@ -9,7 +9,7 @@ loading() {
 loaded() {
   local t=$1
   loadend=$(date +%s)
-  printf "\r\033[32;1m Loaded $t:\033[0m $((($loadend-$loadstart)%60))s\n"
+  printf "\r\033[32;1m Loaded $t:\033[0m $((($loadend - $loadstart) % 60))s\n"
 }
 ##################################
 ## ZSH SETUP
@@ -64,8 +64,12 @@ export PATH=/usr/local/bin:$PATH
 ### Add sbin path
 export PATH=$PATH:/usr/local/sbin
 
+### Poetry for Python
+export PATH="$PATH:$HOME/.poetry/bin"
+
 ### Add Python to PATH
 export PATH="$PATH:$HOME/Library/Python/3.7/bin"
+export PATH="$PATH:$HOME/Library/Python/2.7/bin"
 
 ### Add flutter to PATH
 export PATH="$PATH:$HOME/dev/tools/flutter/bin"
@@ -87,7 +91,7 @@ loaded "env-vars"
 loading "nvm"
 
 export NVM_DIR="$HOME/.nvm"
-lazyload 'source /usr/local/opt/nvm/nvm.sh' nvm
+source /usr/local/opt/nvm/nvm.sh
 
 loaded "nvm"
 
@@ -96,21 +100,21 @@ loading "Fuzzy Finder"
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 loaded "Fuzzy Finder"
 
-## Google Cloud
-loading "google-cloud"
-# The next line updates PATH for the Google Cloud SDK.
-if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then 
-    source "${HOME}/google-cloud-sdk/path.zsh.inc"
-fi
+# ## Google Cloud
+# loading "google-cloud"
+# # The next line updates PATH for the Google Cloud SDK.
+# if [ -f "${HOME}/google-cloud-sdk/path.zsh.inc" ]; then
+#     source "${HOME}/google-cloud-sdk/path.zsh.inc"
+# fi
 
-# The next line enables shell command completion for gcloud.
-if [ -f "${HOME}/google-cloud-sdk/completion.bash.inc" ]; then 
-    source "${HOME}/google-cloud-sdk/completion.zsh.inc"
-fi
+# # The next line enables shell command completion for gcloud.
+# if [ -f "${HOME}/google-cloud-sdk/completion.bash.inc" ]; then
+#     source "${HOME}/google-cloud-sdk/completion.zsh.inc"
+# fi
 
-export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
+# export PATH="/usr/lib/google-cloud-sdk/bin:$PATH"
 
-loaded "google-cloud"
+# loaded "google-cloud"
 
 ### Load Kubernetes and Minikube
 #loading "kubernetes"
@@ -140,4 +144,4 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-scripts
 loaded "zsh-sources"
 
 end=$(date +%s)
-printf "\033[34;1m Loaded all: \033[0m $((($end-$start) % 60))s\n"
+printf "\033[34;1m Loaded all: \033[0m $((($end - $start) % 60))s\n"

@@ -20,9 +20,9 @@ if ! zgen saved; then
 
   # completions
   zgen load zsh-users/zsh-syntax-highlighting
-  # zgen load zsh-users/zsh-history-substring-search
-  # zgen load zsh-users/zsh-autosuggestions
-  # zgen load zsh-users/zsh-completions src
+  zgen load zsh-users/zsh-history-substring-search
+  zgen load zsh-users/zsh-autosuggestions
+  zgen load zsh-users/zsh-completions src
   zgen load djui/alias-tips
   zgen load dbz/kube-aliases
 

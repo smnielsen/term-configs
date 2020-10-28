@@ -1,10 +1,11 @@
 ########################################
 ## Git / Version Handling
 ########################################
-alias grebase='git stash; git fetch; git pull --rebase'
+alias grebase='git stash; git fetch -p; git pull --rebase'
 alias gpush='git stash; git push'
 alias gtagsort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 alias gdiffname="git diff-tree --no-commit-id --name-only -r $1"
+alias gmr='git stash; gcm; grebase'
 
 ########################################
 ## NPM Helpers
@@ -20,6 +21,14 @@ alias dcol="docker-compose logs $1"
 alias dcolf="docker-compose logs -f $1"
 
 ########################################
+## Python
+########################################
+alias p="python"
+alias p3="python3"
+alias pi="python -m pip"
+alias pi3="python3 -m pip"
+
+########################################
 ## Java + Gradlew
 ########################################
 alias gw='./gradlew'
@@ -28,6 +37,13 @@ alias gw='./gradlew'
 ## Docker Helpers
 ########################################
 alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docker volume rm $(docker volume ls -f dangling=true -q);'
+
+########################################
+## Directory Helpers
+########################################
+alias cd-sjm='cd ~/dev/signavio/journeymaps; grebase'
+alias cd-sk8s='cd ~/dev/signavio/suite-k8sconfig; grebase'
+alias cd-sinf='cd ~/dev/signavio/suite-infrastructure; grebase'
 
 ########################################
 ## Couchbase Helpers

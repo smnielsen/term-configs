@@ -21,7 +21,7 @@ step() {
 success() {
   local t=$1
   local end=$(date +%s)
-  printf "  \033[32;1mDone ${STEP_COUNT}: $t:\033[0m $((($end-$start)%60))s\n"
+  printf "  \033[32;1mDone ${STEP_COUNT}: $t:\033[0m $((($end - $start) % 60))s\n"
 }
 
 echoAll() {
@@ -61,16 +61,16 @@ finishUp() {
   echo ""
 
   cd ${PREV_DIR}
-  log "Finished init-new-mac!";
+  log "Finished init-new-mac!"
 }
 
 installProgram() {
   local command=$1
   local program=$2
-  if brew ls --versions $program > /dev/null; then
+  if brew ls --versions $program >/dev/null; then
     log "=> $program already installed"
   else
-    brew $command $program >> /dev/null
+    brew $command $program >>/dev/null
   fi
 }
 
@@ -131,6 +131,8 @@ CASK=(
   java
   minikube
   pgadmin4
+  disk-inventory-x
+  daisydisk
 )
 
 MAS=(
@@ -165,9 +167,12 @@ log "    ¯\_(ツ)_/¯      "
 while true; do
   read -p "Do you wish to continue (y/n)? " yn
   case $yn in
-    [Yy]* ) echo "Continuing..."; break;;
-    [Nn]* ) exit;;
-    * ) echo "Please answer yes or no.";;
+  [Yy]*)
+    echo "Continuing..."
+    break
+    ;;
+  [Nn]*) exit ;;
+  *) echo "Please answer yes or no." ;;
   esac
 done
 
@@ -188,9 +193,9 @@ cd ## Start in HOME dir
 
 step "Configure oh-my-zsh"
 if [ -z $(command -v ascii-dunno) ]; then
-  echo "## Custom config from: https://github.com/smnielsen/config" > .zshrc
-  echo "export SMN_CONFIG_DIR=${HOME}/${DIRNAME}" >> .zshrc
-  echo "source ${HOME}/${DIRNAME}/zsh/.zshrc" >> .zshrc
+  echo "## Custom config from: https://github.com/smnielsen/config" >.zshrc
+  echo "export SMN_CONFIG_DIR=${HOME}/${DIRNAME}" >>.zshrc
+  echo "source ${HOME}/${DIRNAME}/zsh/.zshrc" >>.zshrc
   success "oh-my-zsh configured = .zshrc"
 else
   success "ZSH already configured"
@@ -216,11 +221,11 @@ success "Xcode setup"
 
 ###############################
 # SSH Creation and add
-if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then 
+if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then
   log "Create SSH key"
   ssh-keygen
   ssh-add
-  pbcopy < ~/.ssh/id_rsa.pub
+  pbcopy <~/.ssh/id_rsa.pub
   printf ""
   success "SSH done -> pubkey copied to clipboard"
 fi
@@ -266,9 +271,15 @@ step "Install All Applications"
 while true; do
   read -p "Do you wish to continue (y/n)? " yn
   case $yn in
-    [Yy]* ) echo "Continuing with installation..."; break;;
-    [Nn]* ) finishUp; exit;;
-    * ) echo "Please answer yes or no.";;
+  [Yy]*)
+    echo "Continuing with installation..."
+    break
+    ;;
+  [Nn]*)
+    finishUp
+    exit
+    ;;
+  *) echo "Please answer yes or no." ;;
   esac
 done
 
@@ -296,7 +307,7 @@ for program in "${MAS[@]}"; do
 
   if [ -z "$(mas list | grep $id)" ]; then
     log "mas install $name: $id"
-    mas install $id >> /dev/null
+    mas install $id >>/dev/null
   else
     log "=> $name:$id Already installed"
   fi

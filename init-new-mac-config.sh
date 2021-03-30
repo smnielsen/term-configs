@@ -161,7 +161,7 @@ fi
 step "Install Homebrew"
 if [ -z $(command -v brew) ]; then
   log "Installing Homebrew"
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   success "Installed Homebrew"
 else
   success "Homebrew already installed"

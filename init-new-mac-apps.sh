@@ -73,21 +73,7 @@ installProgram() {
     brew $command $program >>/dev/null
   fi
 }
-
-ZSH_REQ=(
-  zsh
-  zsh-syntax-highlighting
-  zsh-autosuggestions
-  zsh-git-prompt
-  nvm
-  git
-)
-
-BREW=(
-  mas # Mac App Store installation CLI
-  yarn
-  watchman
-  kubectx # Kubernetes https://github.com/ahmetb/kubectx
+BREW_ARCHIVE=(
   fzf
   rabbitmq
   mongodb
@@ -95,69 +81,74 @@ BREW=(
   jpeg
   imagemagick
   pngquant
-  TomAnthony/brews/itermocil
+  watchman
   couchdb
   mongoose
   go
   glide
   unrar
-  kubernetes-helm
-  azure-cli
-  python3
   mosquitto
   gnupg
   git-crypt
-  jesseduffield/lazygit/lazygit
   hugo # Technical Documentation https://gohugo.io/getting-started/installing/
+)
+
+BREW=(
+  mas # Mac App Store installation CLI
+  yarn
+  kubectx # Kubernetes https://github.com/ahmetb/kubectx
+  TomAnthony/brews/itermocil
+  kubernetes-helm
+  azure-cli
+  python3
+  jesseduffield/lazygit/lazygit
   httpie  
   bat
 )
 
-CASK=(
-  franz
+CASK_ARCHIVE=(
   google-chrome
-  firefox
-  slack
   pencil
-  1password
-  evernote
-  dropbox
-  sizeup
   atom
+  sublime-text
   mysqlworkbench
   iterm2
-  sublime-text
+  android-studio
   webstorm
   macdown
-  skitch
-  android-studio
   java
   minikube
   pgadmin4
   disk-inventory-x
+)
+
+CASK=(
+  franz
+  firefox
+  slack
+  1password
+  evernote
+  dropbox
+  dbeaver-community
+  sizeup
+  skitch
   daisydisk
 )
 
 MAS=(
   "Xcode:497799835"
-  "Boxy:1053031090"
-  "Keynote:409183694"
-  "Todoist:585829637"
 )
 
 YARN_GLOBAL=(
   create-react-app
   create-react-native-app
   react-native-cli
-  grunt-cli
+  vue-cli
   nodemon
-  webpack-dev-server
 )
 
 ## Not avaliable
 MANUAL=(
-  "Outlook;https://webmail.netlight.com"
-  "Docker;https://hub.docker.com/editions/community/docker-ce-desktop-mac"
 )
 
 step "Installation of a new Mac OS X Computer"
@@ -166,110 +157,10 @@ log "* Will reset applications"
 log "* Will remove already set configs"
 log "Make sure to follow progress when configuring system initially..."
 bold "Continuing is on your own risk."
-log "    ¯\_(ツ)_/¯      "
-while true; do
-  read -p "Do you wish to continue (y/n)? " yn
-  case $yn in
-  [Yy]*)
-    echo "Continuing..."
-    break
-    ;;
-  [Nn]*) exit ;;
-  *) echo "Please answer yes or no." ;;
-  esac
-done
-
-###############################
-## PACKAGE EVALS
-step "Verifying oh-my-zsh..."
-if [ ! -f ${HOME}/.zshrc ]; then
-  log "Missing .zshrc!"
-  log "Please use oh-my-zsh for this suite"
-  log "Installation guide: https://github.com/robbyrussell/oh-my-zsh"
-  exit 1
-fi
-success "Found oh-my-zsh"
-
-PREV_DIR=$(pwd)
-DIRNAME=$(dirname $0)
-cd ## Start in HOME dir
-
-step "Configure oh-my-zsh"
-if [ -z $(command -v ascii-dunno) ]; then
-  echo "## Custom config from: https://github.com/smnielsen/config" >.zshrc
-  echo "export SMN_CONFIG_DIR=${HOME}/${DIRNAME}" >>.zshrc
-  echo "source ${HOME}/${DIRNAME}/zsh/.zshrc" >>.zshrc
-  success "oh-my-zsh configured = .zshrc"
-else
-  success "ZSH already configured"
-fi
-
-###############################
-## SETUP GIT CONFIG
-step "Git Configuration"
-read -p "Git Name (Default=\"Simon Nielsen\"): " gn
-read -p "Git Email (Default=\"simonnielsen@live.se\"): " ge
-GITHUB_NAME=${gn:-"Simon Nielsen"}
-GITHUB_EMAIL=${ge:-"simonnielsen@live.se"}
-git config --global user.name ${GITHUB_NAME}
-git config --global user.email ${GITHUB_EMAIL}
-git config --global core.ignorecase false
-success "Configured GIT"
-
-###############################
-# Install Xcode deps & Git
-step "Install Xcode deps and Git"
-xcode-select --install
-success "Xcode setup"
-
-###############################
-# SSH Creation and add
-if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then
-  log "Create SSH key"
-  ssh-keygen
-  ssh-add
-  pbcopy <~/.ssh/id_rsa.pub
-  printf ""
-  success "SSH done -> pubkey copied to clipboard"
-fi
-
-###############################
-# Homebrew
-step "Install Homebrew"
-if [ -z $(command -v brew) ]; then
-  log "Installing Homebrew"
-  /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  success "Installed Homebrew"
-else
-  success "Homebrew already installed"
-fi
-
-###############################
-# Install zgen and required apps
-step "Installing zgen"
-if [ ! -d "${HOME}/.zgen" ]; then
-  git clone https://github.com/tarjoilija/zgen.git "${HOME}/.zgen"
-  success "Installed zgen"
-else
-  success "Already installed zgen"
-fi
-
-step "Install required apps"
-for program in "${ZSH_REQ[@]}"; do
-  log "Installing $program..."
-  installProgram install $program
-done
-success "Required apps installed"
-echo ""
-
-###############################
-# Setup dev dirs
-mkdir -p ${HOME}/dev
 
 ###############################
 ## INSTALL ALL APPLICATIONS
 echo ""
-log "All configuration steps done."
 step "Install All Applications"
 while true; do
   read -p "Do you wish to continue (y/n)? " yn

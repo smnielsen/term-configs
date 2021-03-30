@@ -19,7 +19,7 @@ loading "oh-my-zsh"
 export ZSH=~/.oh-my-zsh
 
 # Set default theme
-# ZSH_THEME="robbyrussell"
+# ZSH_THEME="tjkirch"
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 plugins=()
 # plugins+=(history history-substring-search httpie sudo vagrant postgres)
@@ -140,6 +140,9 @@ source ${SMN_CONFIG_DIR}/zsh/.zsh-golang
 
 # Custom aliases
 source ${SMN_CONFIG_DIR}/zsh/.zsh-scripts
+
+# Load sennder client scripts
+source ${SMN_CONFIG_DIR}/zsh/.zsh-sennder
 
 loaded "zsh-sources"
 

@@ -5,7 +5,7 @@ alias grebase='git stash; git fetch -p; git pull --rebase'
 alias gpush='git stash; git push'
 alias gtagsort="git tag -l | sort -n -t. -k1,1 -k2,2 -k3,3 -k4,4"
 alias gdiffname="git diff-tree --no-commit-id --name-only -r $1"
-alias gmr='git stash; gcm; grebase'
+alias gmergemaster="git fetch origin; git merge origin/master"
 
 ########################################
 ## NPM Helpers
@@ -44,6 +44,7 @@ alias docker-prune='docker-compose down; docker rm -vf $(docker ps -a -q); docke
 alias cd-sjm='cd ~/dev/signavio/journeymaps; grebase'
 alias cd-sk8s='cd ~/dev/signavio/suite-k8sconfig; grebase'
 alias cd-sinf='cd ~/dev/signavio/suite-infrastructure; grebase'
+alias npm-module-remove-recursive='find . -regex ".*/node_modules" | xargs rm -rf'
 
 ########################################
 ## Couchbase Helpers

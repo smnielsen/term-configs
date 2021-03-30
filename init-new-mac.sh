@@ -107,7 +107,10 @@ BREW=(
   mosquitto
   gnupg
   git-crypt
+  jesseduffield/lazygit/lazygit
   hugo # Technical Documentation https://gohugo.io/getting-started/installing/
+  httpie  
+  bat
 )
 
 CASK=(

@@ -1,6 +1,6 @@
 # load zgen
 source "${HOME}/.zgen/zgen.zsh"
-if ! zgen saved; then
+#if ! zgen saved; then
   # specify plugins here
   zgen oh-my-zsh
 
@@ -12,8 +12,6 @@ if ! zgen saved; then
   zgen oh-my-zsh plugins/node
   zgen oh-my-zsh plugins/npm
   zgen oh-my-zsh plugins/yarn
-
-  zgen oh-my-zsh themes/arrow
 
   # auto update
   zgen load unixorn/autoupdate-zgen
@@ -29,9 +27,11 @@ if ! zgen saved; then
   zgen load qoomon/zsh-lazyload
 
   # themes
-#  zgen load carloscuesta/materialshell materialshell
+#  zgen oh-my-zsh themes/arrow
+#  zgen oh-my-zsh themes/tjkirch
+#  zgen load akinjide/chi themes
   zgen load XsErG/zsh-themes themes/lazyuser
 
   # generate the init script from plugins above
   zgen save
-fi
+#fi

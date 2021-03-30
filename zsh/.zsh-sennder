@@ -1,0 +1,29 @@
+########################################
+## sennder AWS helpers
+########################################
+alias sennder-aws-credentials="open https://sennder.awsapps.com/start/"
+alias sennder-aws-erc-docker-login="aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 557594345551.dkr.ecr.eu-central-1.amazonaws.com"
+
+sennder-aws() {
+    DOCKER_IMAGE="557594345551.dkr.ecr.eu-central-1.amazonaws.com/platform/docker-base-images/python-3.8-datadog:latest"
+    export AWS_PROFILE=557594345551_EKS-Developers
+
+    echo "-- Login to sennder AWS-ECR --"
+    echo "   | Using profile: $AWS_PROFILE"
+    echo -n "   | => Docker... "
+    sennder-aws-erc-docker-login
+
+    echo "   | => Validating AWS credentials... "
+    PULLED=$(docker pull $DOCKER_IMAGE)
+    if [[ $PULLED == *"Status: Downloaded newer image"* ]] || [[ $PULLED == *"Status: Image is up to date"* ]]; then
+        echo "   | ✅ sennder ECR enabled"
+    else
+        echo "   | ⚠️  Not authenticated, fetch credentials...  ⚠️"
+        echo "   ...Please follow steps:"
+        echo "   1. Fetch latest credentials from https://sennder.awsapps.com/start/"
+        echo "   2. Update in ~/.aws/credentials with exact details from EKS_Developer"
+        echo "   3. Re-run $ sennder-aws"
+        sennder-aws-credentials
+        nano ~/.aws/credentials
+    fi
+}

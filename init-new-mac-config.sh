@@ -157,17 +157,6 @@ if [ ! -f "${HOME}/.ssh/id_rsa.pub" ]; then
 fi
 
 ###############################
-# Homebrew
-step "Install Homebrew"
-if [ -z $(command -v brew) ]; then
-  log "Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-  success "Installed Homebrew"
-else
-  success "Homebrew already installed"
-fi
-
-###############################
 # Install zgen and required apps
 step "Installing zgen"
 if [ ! -d "${HOME}/.zgen" ]; then

@@ -87,11 +87,16 @@ export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/opt/X11/lib/
 
 loaded "env-vars"
 
+loading "brew"
+eval "$(/opt/homebrew/bin/brew shellenv)"
+loaded "brew"
+
 ### Load nvm
 loading "nvm"
 
 export NVM_DIR="$HOME/.nvm"
-source /usr/local/opt/nvm/nvm.sh
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 loaded "nvm"
 

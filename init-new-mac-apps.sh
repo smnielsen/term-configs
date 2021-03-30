@@ -182,11 +182,12 @@ done
 step "Install Homebrew"
 if [ -z $(command -v brew) ]; then
   log "Installing Homebrew"
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"  
   success "Installed Homebrew"
 else
   success "Homebrew already installed"
 fi
+brew update
 
 step "Install Terminal Apps"
 for program in "${BREW[@]}"; do
@@ -199,7 +200,7 @@ echo ""
 step "Install Cask Programs"
 for program in "${CASK[@]}"; do
   log "Installing $program..."
-  installProgram cask $program
+  installProgram "install --cask" $program
 done
 success "Cask Programs installed"
 echo ""

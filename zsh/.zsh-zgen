@@ -1,6 +1,6 @@
 # load zgen
 source "${HOME}/.zgen/zgen.zsh"
-#if ! zgen saved; then
+if ! zgen saved; then
   # specify plugins here
   zgen oh-my-zsh
 
@@ -34,4 +34,4 @@ source "${HOME}/.zgen/zgen.zsh"
 
   # generate the init script from plugins above
   zgen save
-#fi
+fi

@@ -1,29 +1,63 @@
 ########################################
 ## sennder AWS helpers
 ########################################
-alias sennder-aws-credentials="open https://sennder.awsapps.com/start/"
-alias sennder-aws-erc-docker-login="aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin 557594345551.dkr.ecr.eu-central-1.amazonaws.com"
+export AWS_PROFILE_EKS="sennder-spectator"
+export AWS_PROFILE_ECS="sennder-operator"
+export SENNDER_ECR_REPO_ECS="075050162388.dkr.ecr.eu-central-1.amazonaws.com"
+export SENNDER_ECR_REPOSITORY="557594345551.dkr.ecr.eu-central-1.amazonaws.com"
+export SENNDER_AWS_START="https://sennder-ng.awsapps.com/start/"
+alias sennder-open-aws="open ${SENNDER_AWS_START}"
+
+alias sennder-aws-spectator-docker-login="aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${SENNDER_ECR_REPOSITORY}"
+alias sennder-aws-operator-docker-login="aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${SENNDER_ECR_REPO_ECS}"
+alias sennder-aws-sso-sennder="aws sso login --profile ${AWS_PROFILE_EKS}"
+alias sennder-aws-sso-cicd="aws sso login --profile ${AWS_PROFILE_ECS}"
+
+_download_docker() {
+  local DOCKER_IMAGE=$1
+  echo "   | => Validating AWS credentials... "
+  PULLED=$(docker pull $DOCKER_IMAGE)
+  if [[ $PULLED == *"Status: Downloaded newer image"* ]] || [[ $PULLED == *"Status: Image is up to date"* ]]; then
+    echo "   | ✅ sennder ECR enabled"
+  else
+    echo "   | ⚠️  Not authenticated, fetch credentials...  ⚠️"
+    echo "   ...Please follow steps:"
+    echo "   1. Fetch latest credentials from ${SENNDER_AWS_START}"
+    echo "   2. Update in ~/.aws/credentials with exact details from EKS_Developer"
+    echo "   3. Re-run $ sennder-aws"
+    sennder-open-aws
+    nano ~/.aws/credentials
+  fi
+}
 
 sennder-aws() {
-    DOCKER_IMAGE="557594345551.dkr.ecr.eu-central-1.amazonaws.com/platform/docker-base-images/python-3.8-datadog:latest"
-    export AWS_PROFILE=557594345551_EKS-Developers
+    DOCKER_MICRO_SERVICE_IMAGE_ECS="${SENNDER_ECR_REPO_ECS}/platform/docker-base-images/python-3.8-datadog:latest"
+    DOCKER_MICRO_SERVICE_IMAGE="${SENNDER_ECR_REPOSITORY}/platform/docker-base-images/python-3.8-datadog:latest"
+    DOCKER_MOTHERSHIP_POSTGRES_IMAGE="${SENNDER_ECR_REPOSITORY}/postgres-postgis-with-data:latest-reduced"
 
-    echo "-- Login to sennder AWS-ECR --"
-    echo "   | Using profile: $AWS_PROFILE"
+    echo "-- Login to sennder AWS --"
+    echo "   | Using profile: $AWS_PROFILE_EKS"
+    sennder-aws-sso-sennder
+    export AWS_PROFILE=${AWS_PROFILE_EKS}
     echo -n "   | => Docker... "
-    sennder-aws-erc-docker-login
+    sennder-aws-spectator-docker-login
 
-    echo "   | => Validating AWS credentials... "
-    PULLED=$(docker pull $DOCKER_IMAGE)
-    if [[ $PULLED == *"Status: Downloaded newer image"* ]] || [[ $PULLED == *"Status: Image is up to date"* ]]; then
-        echo "   | ✅ sennder ECR enabled"
-    else
-        echo "   | ⚠️  Not authenticated, fetch credentials...  ⚠️"
-        echo "   ...Please follow steps:"
-        echo "   1. Fetch latest credentials from https://sennder.awsapps.com/start/"
-        echo "   2. Update in ~/.aws/credentials with exact details from EKS_Developer"
-        echo "   3. Re-run $ sennder-aws"
-        sennder-aws-credentials
-        nano ~/.aws/credentials
-    fi
+    echo "   | => EKS: Caching Docker Images for Python Micro-services... "
+    _download_docker ${DOCKER_MICRO_SERVICE_IMAGE}
+
+    # echo "   | => Caching docker image for Mothership..."
+    # _download_docker ${DOCKER_MOTHERSHIP_POSTGRES_IMAGE}
+
+    echo "-- Switching to CI/CD ECS profile --"
+    echo "   | Using profile: $AWS_PROFILE_ECS"
+    sennder-aws-sso-cicd
+    export AWS_PROFILE=${AWS_PROFILE_ECS}
+    echo -n "   | => Docker... "
+    sennder-aws-operator-docker-login
+
+    echo "   | => ECS: Caching Docker Images for Python Micro-services... "
+    _download_docker ${DOCKER_MICRO_SERVICE_IMAGE_ECS}
+
+    echo "   | Success! Now you can start /orcas-dev"
+    cd ~/dev/sennder/orcas-dev
 }

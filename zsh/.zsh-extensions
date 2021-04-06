@@ -13,6 +13,11 @@ alias gmergemaster="git fetch origin; git merge origin/master"
 alias npm-clean='rm -rf node_modules; rm -f package-lock.json'
 alias npm-reset='npm-clean; nvm i; npm i'
 
+
+## Localhost Proxy
+########################################
+alias ngrok='~/ngrok'
+
 ########################################
 ## docker-compose helpers
 ########################################

@@ -22,5 +22,9 @@
     "jsonwebtoken": "^8.5.1",
     "prettier": "^2.2.1",
     "simple-oauth2": "^4.2.0"
+  },
+  "dependencies": {
+    "@google-cloud/translate": "^6.2.0",
+    "commander": "^7.2.0"
   }
 }
